@@ -1,0 +1,83 @@
+#post-body-content{
+	/* display: none; */
+}
+.column-custom_images img{
+	float: left;
+	max-width: 70px;
+	margin-right: 10px;
+}
+#order_status_display{
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.open-order-status-select{
+	text-decoration: underline;
+}
+select#cu_pr_order_id{
+	width: 100%;
+}
+#cu_pr_item_id_chzn{
+	width: 100% !important
+}
+.item-select.hide{
+	display: none;
+}
+.select-notify{
+	display: block;
+}
+.info-digit {
+    background: none repeat scroll 0 0 #CCCCCC;
+    border-radius: 5px 5px 5px 5px;
+    font-size: 14px;
+    margin-bottom: 8px;
+    padding: 8px;
+    text-shadow: 0 1px 0 #ECECEC;
+}
+.info-digit.ok{
+	background: #1FAD5F;
+	text-shadow: none;
+	color: #ffffff;
+}
+.not-ok{
+	color: red;
+}
+.tpl-textarea{
+	width: 50%;
+	height: 200px;
+}
+.widefat .column-order_status mark.uploaded{
+	background-color: #6eba2e;
+	background-image: url(../img/uploaded_6eba2e.png);
+}
+.widefat .column-order_status mark.ready{
+	background-color: #6eba2e;
+	background-image: url(../img/ready_6eba2e.png);
+}
+.wp_themeSkin .mceIcon.mce_cpm_email_sc {
+	background-color: #cccccc;
+    background-image: url("../img/uploaded_6eba2e.png") !important;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 70% auto;
+}
+#cpm_email_shortcode{
+	display: none;
+}
+.sc-list li{
+	display: block;
+	cursor: pointer;
+}
+.sc-list li:hover{
+	background: #cccccc;
+}
+.notify-customer-box span{
+	margin: 15px 0;
+	display: inline-block;
+}
+#notify_customer{
+	float: right;
+	margin: 10px 0;
+}
+.chosen-img-admin-display img{
+	max-width: 100%;
+}

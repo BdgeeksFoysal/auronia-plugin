@@ -1,0 +1,130 @@
+#cu_pr_preview ul{
+	position: relative;
+	margin-bottom: 35px;
+	text-align: center;
+}
+.available-image-list li{
+	position: relative;
+	display: inline-block;
+	width: 24%;
+	margin: 1% 0.3%;
+}
+#cu_pr_preview figure{
+	margin-bottom: 25px;
+}
+.cu_pr-chosen-img img{
+	border: 5px solid #bcbcbc;
+	max-width: 98%;
+	/* -webkit-box-shadow: 0px 10px 12px -8px #757575;
+	        box-shadow: 0px 10px 12px -8px #757575;
+	 */
+}
+.cu_pr-select-item p,
+.cu_pr-product_chosen,
+.cu_pr-order_submitted{
+	display: none;
+}
+.cu_pr-image-title{
+	margin-bottom: 15px;
+	font-size: 20px;
+}
+.fantasia-header,
+.fantasia-footer{
+	font-size: 16px;
+	font-weight: bold;
+	font-style: italic;
+	line-height: 22px;
+	padding: 15px;
+}
+.fantasia-header p{
+	margin-bottom: 5px;
+}
+.fantasia-footer{
+	font-weight: normal;
+	margin-bottom: 25px;
+}
+.cu_pr-prod-notice{
+	font-size: 14px;
+	font-weight: bold;
+	font-style: italic;
+	line-height: 20px;
+	padding: 15px;
+	padding-right: 100px;
+}
+.submission-complete-msg{
+	font-size: 22px;
+	text-align: center;
+	margin-bottom: 20px;
+	margin-top: 10px;
+}
+.available-image-list img{
+	width: 95%;
+	height: 300px;
+	overflow: hidden;
+	border: 5px solid #bcbcbc;
+	-webkit-box-shadow: 0px 10px 12px -8px #757575;
+	        box-shadow: 0px 10px 12px -8px #757575;
+}
+.cu_pr-select-item .button.cu_pr-image-choice-button {
+    display: block;
+}
+#cu_pr_preview div.select-item{
+	position: absolute;
+	bottom: -15px;
+	width: 100%;
+	margin: 0 auto;
+}
+#cu_pr_preview .privacy-terms{
+	margin-bottom: 15px;
+}
+.single-cu_pr .error{
+	color: red;
+}
+.privacy-terms input{
+	float: left;
+}
+.privacy-terms div{
+	max-height: 70px;
+	-ms-overflow-y: scroll;
+	    overflow-y: scroll;
+	line-height: 18px;
+	margin-left: 25px;
+}
+.share-social li{
+	text-align: center;
+	margin: 15px;
+	display: inline;
+	position: relative;
+}
+.share-social li a{
+	text-decoration: none;
+}
+.share-social li a:after{
+    position: absolute;
+    content: " ";
+    left: 0;
+    bottom: 0;
+    width: 46px;
+    border: 1px solid #FFFFFF;
+	-webkit-transition: all 0.1s linear;
+	   -moz-transition: all 0.1s linear;
+	    -ms-transition: all 0.1s linear;
+	     -o-transition: all 0.1s linear;
+	        transition: all 0.1s linear;
+    -webkit-box-shadow: 0 10px 6px #000000;
+            box-shadow: 0 10px 6px #000000;
+}
+.share-social li a:hover:after {
+	-webkit-box-shadow: none;
+	        box-shadow: none;
+}
+.share-social li img{
+	max-width: 48px;
+}
+.cu_pr_popup_text{
+	display: none;
+}
+.cu_pr_popup_trigger{
+	cursor: pointer;
+	text-decoration: underline;
+}
