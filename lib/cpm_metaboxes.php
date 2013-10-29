@@ -140,9 +140,9 @@ class CPM_Metaboxes{
 		<?php
 			$this_order_id = get_post_meta($post->ID, 'cu_pr_order_id', TRUE);
 
-			$args = array('post_type'	=> 'shop_order');
-
-			$orders = get_posts( $args );
+			$orders = new WP_Query(array(
+				'post_type'	=> 'shop_order'
+			));
 					
 		?>
 		<div class="misc-pub-section">
@@ -152,14 +152,15 @@ class CPM_Metaboxes{
 				<select name="cu_pr_order_id" id="cu_pr_order_id" class="required chzn-select">
 					<option value="">Choose An Order Id</option>
 			<?php
-				foreach ( $orders as $order ) : setup_postdata($order);
-					$woo_order = new WC_Order($order->ID);
-					$selected = ($this_order_id == $woo_order->id) ? 'selected="selected"' : ''; 
+				if( $orders->have_posts() ){
+					while( $orders->have_posts() ){
+						$orders->the_post(); 
+						$woo_order = new WC_Order( get_the_ID() );
+						$selected = ($this_order_id == $woo_order->id) ? 'selected="selected"' : ''; 
 
-					echo '<option value="'. $woo_order->id .'" '. $selected .'>Order #'. $woo_order->id .'</option>';
-				endforeach;
-				wp_reset_postdata();
-				wp_reset_query();
+						echo '<option value="'. $woo_order->id .'" '. $selected .'>Order #'. $woo_order->id .'</option>';
+					}
+				}
 			?>		
 				</select>
 			</div>
@@ -211,14 +212,14 @@ class CPM_Metaboxes{
 		
 		<?php if( get_post_status( $post->ID ) == 'publish' ): ?>
 			<div class="clearfix notify-customer-box">
-				<input id="notify_customer" class="button button-primary button-large" value="Notify Customer" type="submit">
+				<input id="cu_pr_notify_customer" class="button button-primary button-large" value="Notify Customer" type="submit">
 			</div>
 		<?php endif; ?>
 	<?php
 	}
 
 	public function save_meta_boxes($post_id, $post){
-		if (!wp_verify_nonce( $_POST['cu_pr_order_status_noncename'], plugin_basename(__FILE__))) {
+		if ( !isset($_POST['cu_pr_order_status_noncename']) || !wp_verify_nonce( $_POST['cu_pr_order_status_noncename'], plugin_basename(__FILE__)) ) {
 			return $post->ID;
 		}
 
@@ -237,21 +238,23 @@ class CPM_Metaboxes{
 		$cu_pr_meta['privacy_txt'] 					= $_POST['privacy_txt'];
 		$cu_pr_meta['conditions_txt'] 				= $_POST['conditions_txt'];
 
-		$order = new WC_Order($cu_pr_meta['cu_pr_order_id']);
-		$order->update_status($cu_pr_meta['cu_pr_order_status']);
-		
-		// Add values of custom product meta as custom fields
-		foreach ($cu_pr_meta as $key => $value) { 
-			if( $post->post_type == 'revision' ) return; 
-			$value = implode(',', (array)$value); 
+		if( isset($cu_pr_meta['cu_pr_order_id']) && !empty($cu_pr_meta['cu_pr_order_id']) ){
+			$order = new WC_Order($cu_pr_meta['cu_pr_order_id']);
+			$order->update_status($cu_pr_meta['cu_pr_order_status']);
+			
+			// Add values of custom product meta as custom fields
+			foreach ($cu_pr_meta as $key => $value) { 
+				if( $post->post_type == 'revision' ) return; 
+				$value = implode(',', (array)$value); 
 
-			if(get_post_meta($post->ID, $key, FALSE)) { 
-				update_post_meta($post->ID, $key, $value);
-			}else { 
-				add_post_meta($post->ID, $key, $value);
+				if(get_post_meta($post->ID, $key, FALSE)) { 
+					update_post_meta($post->ID, $key, $value);
+				}else { 
+					add_post_meta($post->ID, $key, $value);
+				}
+
+				if(!$value) delete_post_meta($post->ID, $key); // Delete if blank
 			}
-
-			if(!$value) delete_post_meta($post->ID, $key); // Delete if blank
 		}
 	}
 }

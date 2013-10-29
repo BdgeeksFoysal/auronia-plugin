@@ -1,7 +1,9 @@
 <?php get_header(); ?>
 	
 	<?php if(have_posts()): while(have_posts()): the_post(); ?>
-		<div id="cu_pr_preview" class="woocommerce">
+	<div id="content" class="container cu_pr_preview">
+		<div id="cu_pr_preview" class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<?php 
 				require_once('tpl-loop-cu_pr.php');
 
@@ -13,117 +15,136 @@
 
 				$wc_order = new WC_Order($order_id);
 				$qty = $wc_order->get_item_meta($item_id, '_qty');
-
-				if($chosen || empty($chosen)):
-			?> 
-			<div class="cu_pr-available_images">
+			//if(!$chosen || empty($chosen)):
+			if(true):
+			?>  
+			<div class="row cu_pr-available_images">
 				<input type="hidden" value="<?php echo $item_id; ?>" name="cu_pr_item_id">
 				<input type="hidden" value="<?php echo $order_id; ?>" name="cu_pr_order_id">
 				<input type="hidden" value="<?php echo get_the_ID(); ?>" name="cu_pr_id">
 				
 				<?php cu_pr_print_fantasia_header($tpl); ?>
 
-				<ul class="clear available-image-list">
+				<!--<ul class="clearfix available-image-list">-->
+				<div class="col-md-8 col-sm-8 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-2">
+					<div class="row">
 					<?php 
 						$i = 1;
 						while($img = get_field($img_field_name.$i)):
 					?>
-						<li>
-							<h4 class="cu_pr-image-title">
-								<?php the_field($img_field_name.$i.'_title'); ?>
-							</h4>
+						<!--<li>-->
+						<div class="col-md-4 ">
+							<h5 class="text-center">
+									<?php the_field($img_field_name.$i.'_title'); ?>
+								</h5>
+							<div class="thumbnail">
+								
 
-							<figure>
 								<a href="<?php echo $img['sizes']['large']; ?>" rel="prettyPhoto">
-									<img src="<?php echo $img['sizes']['medium']; ?>" alt="preview image of the customized product">
+									<img class="img-responsive" src="<?php echo $img['sizes']['large']; ?>" alt="Questa è l'anteprima del tuo ordine">
 								</a>
-							</figure>
-
-							<div class="cu_pr-select-item">
-								<a 
-									href="#product_chosen" 
-									class="button cu_pr-image-choice-button" 
-									data-item="<?php echo $img_field_name.$i; ?>" 
-									data-img="<?php echo $img['sizes']['large']; ?>"
-									data-img_id="<?php echo $img['id']; ?>">
-									Scegli
-								</a>
-								<p>
-									<input type="radio" name="cu_pr_image_choice" value="<?php echo $img_field_name.$i; ?>"> 
-									Choose This Design
-								</p>
+								
+								<div class="cu_pr-select-item caption text-center">
+									<a 
+										href="#product_chosen" 
+										class="cu_pr-image-choice-button" 
+										data-item="<?php echo $img_field_name.$i; ?>" 
+										data-img="<?php echo $img['sizes']['large']; ?>"
+										data-img_id="<?php echo $img['id']; ?>">
+										Scegli
+									</a>
+									<p>
+										<input type="radio" name="cu_pr_image_choice" value="<?php echo $img_field_name.$i; ?>"> 
+										Choose This Design
+									</p>
+								</div>
 							</div>
-						</li>
+						</div>
+						<!--</li>-->
 					<?php ++$i; endwhile; ?>
-				</ul>
-
+				<!--</ul>-->
+					</div>
+				</div>
+				<div class="clearfix"></div>
 				<?php cu_pr_print_fantasia_footer($tpl); ?>
 
-				<div class="cu_pr-prod-notice">
+				<div class="row cu_pr-prod-notice">
+					<div class="col-md-12">
 					Se nessuna delle proposte creative dovesse piacerti, 
-					per piacere contattaci alla casella di posta…… e indicaci 
+					per piacere contattaci alla casella di posta servizio.clienti@auronia.it e indicaci 
 					come vorresti che AURONIA realizzasse il trattamento della 
 					tua immagine. Provvederemo a creare delle nuove proposte 
 					più in linea con la tua personalità per realizzare la tua 
 					t-shirt proprio come la desideri. 
+					</div>
 				</div>
 
 			</div>	
 
-			<div class="clear"></div>
+			<div class="clearfix"></div>
 			
-			<div class="cu_pr-product_chosen">	
-				<figure class="cu_pr-chosen-img"></figure>
-				<div class="privacy-terms">
-					<?php 
-						$privacy_txt_lang = get_post_meta(get_the_ID(), 'privacy_txt', TRUE);
-						
-						$privacy_txt = ($privacy_txt_lang == 'it') ? 'cpm_privacy_txt_it' : 'cpm_privacy_txt_en';
-						$privacy_txt = get_option($privacy_txt); 
+			<div class="cu_pr-product_chosen row">	
+				<div class="col-md-12">
+					<h1 class="text-center">Anteprima del tuo ordine</h1>
+					<figure class="text-center cu_pr-chosen-img"></figure>
+					<div class="privacy-terms">
+						<?php 
+							$privacy_txt_lang = get_post_meta(get_the_ID(), 'privacy_txt', TRUE);
+							
+							$privacy_txt = ($privacy_txt_lang == 'it') ? 'cpm_privacy_txt_it' : 'cpm_privacy_txt_en';
+							$privacy_txt = get_option($privacy_txt); 
 
-						$conditions_txt_lang = get_post_meta(get_the_ID(), 'conditions_txt', TRUE);
+							$conditions_txt_lang = get_post_meta(get_the_ID(), 'conditions_txt', TRUE);
 
-						$conditions_txt = ($conditions_txt_lang == 'it') ? 'cpm_conditions_txt_it' : 'cpm_conditions_txt_en';
-						$conditions_txt = get_option($conditions_txt); 
-					?>
-					<input type="checkbox" name="privacy_terms" value="true"> 
-					<div><?php echo $privacy_txt; ?></div>
-					<br/>
-					<input type="checkbox" name="conditions_terms" value="true"> 
-					<div><?php echo $conditions_txt; ?></div>
+							$conditions_txt = ($conditions_txt_lang == 'it') ? 'cpm_conditions_txt_it' : 'cpm_conditions_txt_en';
+							$conditions_txt = get_option($conditions_txt); 
+						?>
+						<input type="checkbox" name="privacy_terms" value="true"> 
+						<div><?php echo $privacy_txt; ?></div>
+						<br/>
+						<input type="checkbox" name="conditions_terms" value="true"> 
+						<div><?php echo $conditions_txt; ?></div>
+					</div>
+					
+					<div class="clearfix"></div>
+					<div class="text-center ">
+						<a href="#" class="btn btn-default" id="back_to_cu_pr_available_images">&laquo; Indietro</a>
+						<a href="#order_submitted" class="btn btn-default" id="submit_choice">Invia ordine &raquo;</a>
+					</div>
 				</div>
-				
-				<div class="clear"></div>
-				<a href="#" class="button alignleft" id="back_to_cu_pr_available_images">&laquo; Back</a>
-				<a href="#order_submitted" class="button alignright" id="submit_choice">Submit Order &raquo;</a>
 			</div>
 
-			<div class="cu_pr-order_submitted">
-				<h3 class="submission-complete-msg">Fai vedere ai tuoi amici la tua creazione!</h3>
-				<figure class="cu_pr-chosen-img"></figure>
-				<h3 class="submission-complete-msg">Condividi la tua grafica unica con tutti</h3>
-				
+			<div class="clearfix"></div>
+
+			<div class="cu_pr-order_submitted row">
+				<div class="col-md-12">
+					<h1 class="submission-complete-msg">Fai vedere ai tuoi amici la tua creazione!</h1>
+					<figure class="text-center  cu_pr-chosen-img"></figure>
+					<h3 class="submission-complete-msg">Condividi la tua grafica unica con tutti</h3>
 				<?php print_social_btns(); ?>
+				</div>
 			</div>
 
 			<?php else: ?>
-				<ul>
+				<div class="row">
 					<?php $img1 = get_field($chosen); if($img1): ?>
-					<li>
+					<div class="col-md-12">
 						<figure>
 							<a href="<?php echo $img1['sizes']['large']; ?>" rel="prettyPhoto">
-								<img src="<?php echo $img1['sizes']['medium']; ?>" alt="preview image of the customized product">
+								<img src="<?php echo $img1['sizes']['large']; ?>" alt="preview image of the customized product">
 							</a>
 						</figure>
 
-						You've Already Choose This Design
-					</li>
+						<h3 class="submission-complete-msg">Condividi la tua creazione Auronia con i tuoi amici</h3>
+					</div>
 					<?php endif; ?>
-				</ul>
+				</div>
 				
 				<?php print_social_btns($img1); ?>
 			<?php endif; ?>
 		</div>
+	</div>
+</div>
 	<?php endwhile; endif; ?>
 
 <?php get_footer(); ?>

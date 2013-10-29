@@ -30,13 +30,19 @@ jQuery(document).ready(function($) {
 					if(ret.status == 'true'){
 						$('.cu_pr-product_chosen').fadeOut(250);
 						$('.cu_pr-order_submitted').delay(200).fadeIn(300);
+						$('body, html').animate({
+							scrollTop: 0
+						}, 500);
 					}
 				}, 'json');
 			}else{
-				$this.after('<span class="error"> &nbsp; You Have to accept the privacy terms and conditions.</span>');
+				//$this.after('<span class="error"> &nbsp; Devi accettare i termini e condizioni del servizio.</span>');
+				privacy.parent().css({
+					'border' : '1px solid red'
+				});
 			}
 		}else{
-			$this.after('<span class="error"> &nbsp; No Items Selected!</span>');
+			$this.after('<span class="error"> &nbsp; Non hai selezionato nessuna proposta!</span>');
 		}
 		
 		setTimeout(function(){
@@ -59,7 +65,7 @@ jQuery(document).ready(function($) {
 
 		$('.cu_pr-available_images').fadeOut(250);
 		$('.cu_pr-chosen-img').html('<img src="'+ img +'" class="aligncenter">');
-		$('.fb-share-btn').attr('href', 'https://facebook.com/sharer/sharer.php?u='+share_uri);
+		$('.fb-share-btn').attr('href', 'https://www.facebook.com/sharer/sharer.php?u='+share_uri);
 		$('.gplus-share-btn').attr('href', 'https://plus.google.com/share?url='+share_uri);
 		$('.twitter-share-btn').attr('href', 'http://twitter.com/intent/tweet?source=auronia.it&url='+share_uri);
 		$('.pinterest-share-btn').attr('href', 'http://pinterest.com/pin/create/button/?url='+ share_uri +'&media='+encodeURIComponent(img));
@@ -75,4 +81,45 @@ jQuery(document).ready(function($) {
 		$('.cu_pr-product_chosen').fadeOut(250);
 		$('.cu_pr-available_images').delay(200).fadeIn(300);
 	});
+
+	if(_CC == 0){
+		var form = $('#coupon_code_request'),
+			coupon_form = $('.checkout_coupon'),
+			shop_url = $('.shop-redirect-url').data('shop');
+
+		form.on('click', 'input[name="apply_coupon"]', function(e){
+
+			e.preventDefault();
+			PostCoupon(form);
+
+		}).on('keypress', function(e){
+
+			if(e.which == 13){
+				coupon_form.submit();
+				PostCoupon(form);
+			}
+
+		});
+
+		var PostCoupon = function (form) {
+			var data = {
+					coupon_code : form.find('input[name="coupon_code"]').val(),
+					action	: 'cu_pr_coupon_code'
+				};
+
+			form.append('<p>Applying Coupon.....</p>');
+
+			$.post(CPM_Ajax.ajaxurl, data, function (ret) {
+				window.location.href = $('.shop-redirect-url').data('shop') + '?cu_pr_applied_coupon=true';
+				console.log(ret);
+			});
+		};
+	}else if(_CC == 1){
+		if($('body').hasClass('woocommerce-cart')){
+			//$('#coupon_code').val(coupon_code).next().trigger('click');
+		}
+		$('.price, .amount').text('Gratis');
+
+	}
+
 });

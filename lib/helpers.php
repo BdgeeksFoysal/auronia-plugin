@@ -31,3 +31,23 @@ function print_social_btns($image = NULL){
 	</ul>
 	<?php
 }
+function cu_pr_get_prod_title( $id ){	
+	$prod_name = "No product found!";
+
+	$order_id = get_post_meta($id, 'cu_pr_order_id', TRUE);
+	$item_id = get_post_meta($id, 'cu_pr_item_id', TRUE);
+
+	if($item_id && !empty($item_id)) {
+		$item = new WC_Order($order_id);
+		$prod_id = $item->get_item_meta($item_id, '_product_id');
+
+		if($prod_id){
+			$prod = get_product((int)$prod_id[0]);
+			$prod_name = $prod->post->post_title;
+		}
+
+	}
+
+	return $prod_name;
+}
+?>

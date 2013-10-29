@@ -1,20 +1,47 @@
+
+#content.cu_pr_preview{ 
+	width: 970px;
+	padding-top: 100px;
+}
+#cu_pr_preview{
+	color: #000;
+}
+#cu_pr_preview .thumbnail {
+    border: 2px solid #000000;
+    border-radius: 0 0 0 0;
+    margin-bottom: 20px;
+    padding: 0;
+    position: relative;
+}
+#cu_pr_preview .thumbnail .caption {
+	background: url("../img/bg_caption.png") repeat scroll 0 0 rgba(0, 0, 0, 0);
+    bottom: 0;
+    display: none;
+    position: absolute;
+    width: 100%;
+    padding:0; 
+}
+#cu_pr_preview .thumbnail .caption a {
+	font-family: "Raleway",Helvetica,Arial; 
+	font-size: 20px;	
+	display: block;
+    padding: 20px 10px;
+} 
+
+
+#gift-certificate-receiver-form{
+	display: none;
+}
 #cu_pr_preview ul{
 	position: relative;
 	margin-bottom: 35px;
 	text-align: center;
 }
-.available-image-list li{
-	position: relative;
-	display: inline-block;
-	width: 24%;
-	margin: 1% 0.3%;
-}
 #cu_pr_preview figure{
 	margin-bottom: 25px;
 }
 .cu_pr-chosen-img img{
-	border: 5px solid #bcbcbc;
-	max-width: 98%;
+	border: 2px solid #000;
 	/* -webkit-box-shadow: 0px 10px 12px -8px #757575;
 	        box-shadow: 0px 10px 12px -8px #757575;
 	 */
@@ -52,18 +79,9 @@
 	padding-right: 100px;
 }
 .submission-complete-msg{
-	font-size: 22px;
 	text-align: center;
 	margin-bottom: 20px;
 	margin-top: 10px;
-}
-.available-image-list img{
-	width: 95%;
-	height: 300px;
-	overflow: hidden;
-	border: 5px solid #bcbcbc;
-	-webkit-box-shadow: 0px 10px 12px -8px #757575;
-	        box-shadow: 0px 10px 12px -8px #757575;
 }
 .cu_pr-select-item .button.cu_pr-image-choice-button {
     display: block;
@@ -84,6 +102,8 @@
 	float: left;
 }
 .privacy-terms div{
+	background-color: #DCDDDD;
+	padding: 5px 8px;
 	max-height: 70px;
 	-ms-overflow-y: scroll;
 	    overflow-y: scroll;
@@ -105,7 +125,6 @@
     left: 0;
     bottom: 0;
     width: 46px;
-    border: 1px solid #FFFFFF;
 	-webkit-transition: all 0.1s linear;
 	   -moz-transition: all 0.1s linear;
 	    -ms-transition: all 0.1s linear;
@@ -113,10 +132,6 @@
 	        transition: all 0.1s linear;
     -webkit-box-shadow: 0 10px 6px #000000;
             box-shadow: 0 10px 6px #000000;
-}
-.share-social li a:hover:after {
-	-webkit-box-shadow: none;
-	        box-shadow: none;
 }
 .share-social li img{
 	max-width: 48px;
@@ -127,4 +142,51 @@
 .cu_pr_popup_trigger{
 	cursor: pointer;
 	text-decoration: underline;
+}
+
+/* shop archive page styling */
+.woocommerce .featured-image-carousel .second-featured{
+	display: none;
+}
+
+/* shop single product page styling */
+.swatch-parent-wrap{
+	float: left;
+}
+.swatch-color-span{
+	width: 94%;
+	height: 8px;
+	display: block;
+	margin-bottom: 3px;
+}
+.swatch-title-span {
+    display: block;
+    text-align: center;
+}
+.cu_pr-product_chosen .btn {
+	margin-bottom: 20px;
+}
+.cu_pr-available_images h5 {
+	margin: 0;
+	padding: 8px 0;
+	background-color: #DCDDDD;
+} 
+/* css for the coupon form 
+
+#coupon_code_request_wrapper {
+    background-color: rgba(68, 68, 68, 0.9);
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+#coupon_code_request{
+	text-align: center;
+	margin-top: 25%;
+}*/
+#coupon_code_request p{
+	color: #000000;
+    font-size: 18px;
+    margin-top: 10px;
 }

@@ -313,8 +313,9 @@ class CPM_Templates{
 	}
 	
 	public static function add_editor_btns(){
-		$pt = $_GET['post_type'];
-		$pg = $_GET['page'];
+		$pt = isset( $_GET['post_type'] ) ? $_GET['post_type'] : NULL;
+		$pg = isset( $_GET['page'] ) ? $_GET['page'] : NULL;
+
 		if(is_admin() && get_user_option('rich_editing') && $pt == 'cu_pr' && $pg = 'cpm_templates.php'){
 			add_filter('mce_external_plugins', 'cpm_mce_plugin');
 			add_filter('mce_buttons', 'register_cpm_email_shortcode_btn');

@@ -1,15 +1,15 @@
 <?php
 /**
-* collection of helper functions to be called statically
-*/
+ * collection of helper functions to be called statically
+ */
 class CPM_Email
 {
 	public $when;		//on what action the mail is being sent
-	public $to;			//to whom the mail is being sent to, admin / customer
+	public $to;			//to whom the mail is being sent, adming / customer
 	public $order_id;	//order id of the email
-	public $order;		//order id of the email
+	public $order;	//order id of the email
 	public $cu_pr_id;	//order id of the email
-	public $prod_name;  //name of the product
+	public $prod_name; //name of the product
 	public $item_uid;	//unique item id of the product
 	public $lang;		//language of the email
 	public $tpl;		//template from the email
@@ -79,7 +79,6 @@ class CPM_Email
 			$this->tpl = $this->apply_email_shortcodes($this->tpl);
 		}
 
-		//var_dump($this->tpl);
 		return $this;
 	}
 
@@ -89,7 +88,7 @@ class CPM_Email
 		add_filter( 'wp_mail_content_type', array('CPM_Email', 'set_html_content_type') ); 
 
 		//if the email is going to admin, fetch the admin email address from the wordpress db
-		$to = ($this->to == 'admin') ? array(get_bloginfo('admin_email'), 'francesca.delsarto@auronia.it', 'paolo.errico@4marketing.it') : $to;
+		$to = ($this->to == 'admin') ? array(get_bloginfo('admin_email'), 'foysal.ahmed@4marketing.it') : $to; // 'francesca.delsarto@auronia.it', 'paolo.errico@4marketing.it'
 
 		if($this->when == 'upload'){ //when the email is to notify that the product is uploaded
 			if($this->lang == 'it'){

@@ -81,3 +81,59 @@ select#cu_pr_order_id{
 .chosen-img-admin-display img{
 	max-width: 100%;
 }
+#acf-cu_pr_image_1_title,
+#acf-cu_pr_image_2_title,
+#acf-cu_pr_image_3_title,
+#acf-cu_pr_image_4_title{
+	display: none;
+}
+#acf_4043 .hndle,
+#acf_43 .hndle,
+#acf_5408 .hndle,
+#cu_pr_email_template .hndle,
+#cu_pr_order_status .hndle{
+	border-color: #05AF77;
+    /*background: linear-gradient(to top, #06A06D, #05AF77);*/
+    background-image: linear-gradient(bottom, rgb(5,171,113) 47%, rgb(6,179,118) 74%);
+	background-image: -o-linear-gradient(bottom, rgb(5,171,113) 47%, rgb(6,179,118) 74%);
+	background-image: -moz-linear-gradient(bottom, rgb(5,171,113) 47%, rgb(6,179,118) 74%);
+	background-image: -webkit-linear-gradient(bottom, rgb(5,171,113) 47%, rgb(6,179,118) 74%);
+	background-image: -ms-linear-gradient(bottom, rgb(5,171,113) 47%, rgb(6,179,118) 74%);
+
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.47, rgb(5,171,113)),
+		color-stop(0.74, rgb(6,179,118))
+	);
+    color: #FFFFFF;
+    text-shadow: none;
+}
+
+.thumb .wc-extension-data {
+	margin-top: 10px;
+    margin-left: -30px !important;
+    text-align: center;
+}
+.thumb .wc-extension-data img {
+    height: 100px !important;
+    width: 100px !important;
+    margin-bottom: 5px !important;
+}
+
+.button.disabled{
+	background: #cccccc !important;
+}
+.button.printed-before{
+	background: #06A06D;
+	border-color: #05AF77;
+	color: #ffffff;
+	text-shadow: none;
+}
+.button.not-printed-before{
+	background: #c93012;
+	border-color: #d30404;
+	color: #ffffff;
+	text-shadow: none;
+}

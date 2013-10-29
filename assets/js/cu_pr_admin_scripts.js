@@ -1,12 +1,9 @@
 jQuery(function($){ //make sure DOM is loaded and pass $ for use
-    $('#post').submit(function(){ // the form submit function
-         $('.required').each(function(){
-           if( $(this).val == '-1' || $(this).val == '' ){ // checks if empty or has a predefined string
-             //insert error handling here. eg $(this).addClass('error');
-             return false; //return false if empty and stop submit event
-           }
-         })
-    });
+    //if the user is editing a custom product - hide the title input
+    if($('#post_type').val() === 'cu_pr'){
+        //$('#title').attr('disabled','disabled');
+        //$('#post-body-content').hide();
+    }
 
     $('select[name="cu_pr_order_status"]').chosen();
 
@@ -64,7 +61,7 @@ jQuery(function($){ //make sure DOM is loaded and pass $ for use
     });
 
     //notifying customer action
-    $('#notify_customer').click(function(e){
+    $('#cu_pr_notify_customer').click(function(e){
         e.preventDefault();
         var $this = $(this),
             data = {
@@ -106,6 +103,130 @@ jQuery(function($){ //make sure DOM is loaded and pass $ for use
 
         PostForm.init('cu_pr_tpl_update', 'form[name="admin_email_tpl_form"]');
     });
+
+
+    var dl_photo_email_box = $('#acf_6279'),
+        dl_photo_notify_button = $('<input >', { 
+            id : "cu_pr_notify_customer", 
+            class : "button button-primary button-large",
+            value : "Notify Customer" ,
+            type : "submit",
+            style: 'margin-top: 10px; cursor: pointer'
+        }),
+        dl_photo_secret_code_button = $('<input >', { 
+            id : "generate_secret_code", 
+            class : "button button-primary button-large",
+            value : "Generate Secret Code" ,
+            type : "submit",
+            style: 'margin-top: 10px; cursor: pointer'
+        });
+
+    if(dl_photo_email_box.length > 0){
+        dl_photo_email_box
+            .find('#acf-customer_email')
+            .append(dl_photo_notify_button);
+
+        dl_photo_notify_button.on('click', function (e) {
+            e.preventDefault();
+            var email = $(this).siblings('input[type="email"]').val();
+
+            if(email.length > 0){
+                var $this = $(this),
+                    data = {
+                        action : 'downloadable_photo_notify_customer',
+                        email  : email
+                    };
+
+                PostForm.showSpinner($this.parent());
+                
+                jQuery.post(ajaxurl, data, function(ret){
+                   if(ret.status == 'true'){
+                        $this.siblings('.spinner').delay(1300).remove();
+                        $this.parent().append('<span class="msg">Email Sent!</span>');
+                    }
+                }, 'json');
+            }
+        });
+
+        /*
+        dl_photo_email_box
+            .find('#acf-secret_code')
+            .append(dl_photo_secret_code_button);
+
+        dl_photo_secret_code_button.on('click', function (e) {
+            e.preventDefault();
+            var code_field = $(this).siblings('input[type="text"]');
+
+            if(code_field.val().length == 0){
+                var $this = $(this),
+                    data = {
+                        action      : 'cpm_generate_secret_code',
+                        code_for    : 'downloadable_photo'
+                    };
+
+                PostForm.showSpinner($this.parent());
+                
+                jQuery.post(ajaxurl, data, function(ret){
+                    $this.siblings('.spinner').delay(1300).remove();
+
+                    if(ret.status == 'true'){
+                        code_field.removeClass('error required');
+                        code_field.val(ret.codes[0]);
+                    }else{
+                        code_field.parent().addClass('error required');
+                        code_field.after('<div>'+ ret.msg +'</div>');
+                    }
+                }, 'json');
+            }
+        });
+        */
+    }
+
+    //adds export, quick generate option ad the top
+    if(typenow == 'cpm_secret_code' && adminpage == 'edit-php'){
+        var $code_type_selector = '<select name="code_for">';
+
+        $.each(CPM_Secret_Code_Types, function(value, label){
+            $code_type_selector += '<option value="'+ value +'">'+ label +'</option>';
+        });
+
+        $code_type_selector += '</select>';
+
+        var $generate_button = $('<p class="search-box" style="margin-left:10px">'
+            +'<input type="text" id="" placeholder="Number of codes" name="total">'
+            +$code_type_selector
+            +'<input type="submit" name="" id="quick_generate_cpm_secret_code" class="button" value="Generate Secret Code">'
+            +'</p>');
+
+        $('#posts-filter').prepend($generate_button);
+
+        $generate_button.on('click', '#quick_generate_cpm_secret_code', function (e) {
+            e.preventDefault();
+            var total = $(this).siblings('input[name="total"]').val(),
+                code_for = $(this).siblings('select[name="code_for"]').find('option:selected').val();
+                
+            if(total.length > 0 && code_for.length > 0){
+                var $this = $(this),
+                    data = {
+                        action : 'cpm_generate_secret_code',
+                        total  : total,
+                        code_for : code_for
+                    };
+
+                PostForm.showSpinner($this.parent());
+                
+                jQuery.post(ajaxurl, data, function(ret){
+                   if(ret.status == 'true'){
+                        $this.siblings('.spinner').delay(1300).remove();
+
+                        window.reload();
+                    }else{
+                        $this.parent().append(ret.msg);
+                    }
+                }, 'json');
+            }
+        });
+    }
 });
 
 PostForm = {

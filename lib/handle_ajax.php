@@ -53,7 +53,7 @@ function cu_pr_add_chosen_cb() {
 		}
 	}
 
-	//echo json_encode($ret);
+	echo json_encode($ret);
 
 	die(); // this is required to return a proper result
 }
@@ -165,5 +165,119 @@ function cu_pr_notify_customer_cb(){
 	if($admin_email->use_tpl()->send_email()) $ret['status'] = 'true';
 
 	echo json_encode($ret);
+	die();
+}
+
+
+add_action('wp_ajax_cu_pr_get_uploaded_img', 'cu_pr_get_uploaded_img_cb');
+
+function cu_pr_get_uploaded_img_cb(){
+	$order = new WC_Order($_POST['order']);
+	$item_id = $_POST['item_id'];
+	$url = $_POST['url'];
+	$ret = array(
+		'status' => 'false'
+	);
+
+	$items = $order->get_items();
+	$item = $order->get_item_meta($item_id);
+	$product = $order->get_product_from_item($items[$item_id]);
+
+	$url = trailingslashit( get_home_url() ).'?uploaded_image='.$url;
+	$url .= '&sku='. $product->sku .'&oid='. $order->id .'&fn='. $order->billing_first_name .'&ln='. $order->billing_last_name;
+
+	$ret['url'] = $url;
+	//$ret['prod'] = $order;
+
+	echo json_encode($ret);
+	die();
+}
+
+
+add_action('wp_ajax_cu_pr_send_upload_image_email', 'cu_pr_send_upload_image_email_cb');
+
+function cu_pr_send_upload_image_email_cb(){
+	$ret = array(
+		'status' => 'false'
+	);
+	$oid = $_POST['order'];
+	$cont = $_POST['content'];
+	$sub = $_POST['subject'];
+	$order = new WC_Order($oid);
+
+	$field = 'cu_pr_upload_img_notification';
+	$val = serialize(array(
+		'sent' => 1,
+		'at'   => time()
+	));
+
+	if( get_post_meta($oid, $field, FALSE) ) { 
+		update_post_meta( $oid, $field, $val );
+	}else { 
+		add_post_meta( $oid, $field, $val );
+	}
+
+	if( wp_mail( $order->billing_email, $sub, $cont ) ){
+		update_field('field_51b5c88deafca', $sub, $oid);
+		update_field('field_51b5cd22eafcb', $cont, $oid);
+		$ret['status'] = 'true';
+	}
+
+	echo json_encode($ret);
+	die();
+}
+
+//function to execute when the user has submitted a coupon
+add_action('wp_ajax_cu_pr_coupon_code', 'cu_pr_coupon_code_cb');
+add_action('wp_ajax_nopriv_cu_pr_coupon_code', 'cu_pr_coupon_code_cb');
+
+function cu_pr_coupon_code_cb(){
+	$ret = array(
+		'status' => 'false',
+		'msg'    => 'Sorry, an error occured while applying the coupon.'
+	);
+
+	$applied = CPM_WC::ApplyShopCoupon($_POST['coupon_code']);
+
+	if( $applied == true){
+		$ret['status'] = 'true';
+		$ret['msg'] = __( 'You\'ve successfully applied your coupon' );
+	}
+
+	$woocommerce->add_message( $ret['msg'] );
+	echo json_encode($ret);
+	die();
+}
+
+
+add_action('wp_ajax_downloadable_photo_notify_customer', array('CFA_Downloadable_Photos', 'downloadable_photo_notify_customer_cb'));
+
+//ajax action that creates a secret code based on type of request
+add_action('wp_ajax_cpm_generate_secret_code', 'cpm_generate_secret_code_cb');
+add_action('wp_ajax_nopriv_cpm_generate_secret_code', 'cpm_generate_secret_code_cb');
+
+function cpm_generate_secret_code_cb(){
+	$ret = array('status' => false);
+
+	if( isset($_POST['code_for']) && !empty($_POST['code_for']) ){
+		$secret_code = new CPM_Secret_Code();
+		$total = isset($_POST['total']) && (int)$_POST['total'] > 0 ? (int)$_POST['total'] : 1;
+
+		if( array_key_exists($_POST['code_for'], $secret_code->code_types) ){
+			$codes = $secret_code->generate_secret_code($_POST['code_for'], $total);
+			
+			if( count($codes) > 0 ){
+				$ret['status'] = true;
+				$ret['codes'] = $codes;
+			}else{
+				$ret['msg'] = 'No code was generated!';
+			}
+		}else{
+			$ret['msg'] = 'request is not valid!';
+		}
+	}
+
+	wp_send_json($ret);
+
 	die();
 }

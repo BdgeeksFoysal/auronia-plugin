@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Customized Product Manager
+Plugin Name: Shop Manager
 Plugin URI: http://www.4marketing.it/
 Description: This plugin enables you to customize your product according to customer's order and manage, sale, upload the product images.
 Version: 1.0.1
@@ -23,11 +23,13 @@ class CPM_Post_Type{
 		//$this->set_and_destroy_sessions();
 		$this->load_assets();
 		$this->register_post_type();
-		$this->add_shortlink_btn();
 		$this->add_custom_columns();
 		$this->add_custom_filters();
 		$this->generate_default_title();
 		$this->redirect_to_cu_pr_tpl();
+
+		//hides wordpress update notification
+		add_filter( 'pre_site_transient_update_core', create_function( '$a', "return null;" ) );
 		//$this->taxonomies();
 	}
 
@@ -67,27 +69,6 @@ class CPM_Post_Type{
 		register_post_type('cu_pr', $args);
 	}
 
-	public function add_shortlink_btn(){
-		add_filter( 'pre_get_shortlink', 'shortlinks_for_cu_pr', 10, 3 );
-
-		function shortlinks_for_cu_pr( $shortlink, $id, $context ) {
-		    $post_id = 0;
-		 
-		    if ( 'query' == $context && is_singular( 'cu_pr' ) ) {
-		        $post_id = get_queried_object_id();
-		    }
-		    elseif ( 'post' == $context ) {
-		        $post_id = $id;
-		    }
-		    
-		    if ( 'cu_pr' == get_post_type( $post_id ) ) {
-		        $shortlink = home_url( '?p=' . $post_id );
-		    }
-		 
-		    return $shortlink;
-		}
-	}
-
 
 	//generate default title so that wordpress creates a default url
 	public function generate_default_title(){
@@ -95,7 +76,7 @@ class CPM_Post_Type{
 
 		function create_default_title($title){
 			$screen = get_current_screen();
-			echo $title;
+			//echo $title;
 
 			if($screen->post_type == 'cu_pr'){
 				$chars = array_merge(range('a', 'z'), range(0, 9));
@@ -112,15 +93,18 @@ class CPM_Post_Type{
 		add_action( 'manage_cu_pr_posts_custom_column', 'my_manage_cu_pr_cols', 10, 2 );
 
 		function edit_cu_pr_cols( $columns ) {
-			$columns = array(
+			$new_columns = array(
 				'cb' => '<input type="checkbox" />',
 				'title' => __( 'Id' ),
+				'date' => __( 'Date' ),
 				'order_status' => __( 'Order Status' ),
+				'product_name' => __( 'Product' ),
+				'chosen_item' => __( 'Chosen Item' ),
 				'order' => __( 'Order#' ),
 				'custom_images' => __( 'Images' )
 			);
 
-			return $columns;
+			return $new_columns;
 		}
 
 		function my_manage_cu_pr_cols($column, $post_id) {
@@ -188,18 +172,30 @@ class CPM_Post_Type{
 
 					break;
 
+				case 'chosen_item' :
+					$chosen_img = get_post_meta($post->ID, 'cu_pr_chosen_img', TRUE);
+					if($chosen_img && !empty($chosen_img)) {
+						$chosen_title = get_post_meta($post->ID, $chosen_img.'_title', TRUE);
+					}else{
+						$chosen_title = 'Not Chosen Yet!';
+					}
+
+					echo $chosen_title;
+
+					break;
+
+				case 'product_name' :
+					echo cu_pr_get_prod_title( $post->ID );
+
+					break;
+
 				case 'custom_images' :
-					$img1 = get_field('cu_pr_image_1');
-					if($img1 && !empty($img1)) echo '<img src="'.$img1['sizes']['thumbnail'].'">';
+					$field = 'cu_pr_image_';
 
-					$img2 = get_field('cu_pr_image_2');
-					if($img2 && !empty($img2)) echo '<img src="'.$img2['sizes']['thumbnail'].'">';
-
-					$img3 = get_field('cu_pr_image_3');
-					if($img3 && !empty($img3)) echo '<img src="'.$img3['sizes']['thumbnail'].'">';
-
-					$img4 = get_field('cu_pr_image_4');
-					if($img4 && !empty($img4)) echo '<img src="'.$img4['sizes']['thumbnail'].'">';
+					for ($i=1; $i < 5; $i++) { 
+						$img = get_field($field.$i);
+						if($img && !empty($img)) echo '<img src="'.$img['sizes']['thumbnail'].'">';
+					}
 
 					break;
 
@@ -275,23 +271,23 @@ class CPM_Post_Type{
 
 		function order_id_filter_list(){
 			$screen = get_current_screen();
-			global $wp_query;
-			$args = array('post_type'	=> 'shop_order');
 
-			$orders = get_posts( $args );
+			$orders = new WP_Query(array(
+				'post_type'	=> 'shop_order'
+			));
 
-			if($screen->post_type == 'cu_pr'){
+			if( $screen->post_type == 'cu_pr' && $orders->have_posts() ) {
 				echo '<select name="order_id" class="chzn-select">';
 				echo '<option value="">Show All</option>';
 
-				foreach ($orders as $order) {
-					echo '<option value="'.$order->ID.'">Order # '. $order->ID .'</option>';
+				while ($orders->have_posts()) {
+					$orders->the_post();
+					echo '<option value="'.get_the_ID().'">Order # '. get_the_ID() .'</option>';
 				}
 
 				echo '</select>';
 			}
 			wp_reset_postdata();
-			wp_reset_query();
 		}
 
 		function perform_order_id_filtering($query){
@@ -311,7 +307,8 @@ class CPM_Post_Type{
 		add_action('admin_print_styles', 'load_only_admin_styles');
 		add_action('admin_init', 'load_only_admin_scripts');
 
-	    add_action( 'admin_head', 'wp_tiny_mce' );
+	    if (function_exists('wp_tiny_mce')) 
+	    	add_action( 'admin_head', 'wp_tiny_mce' );
 
 		add_action('wp_head', 'load_only_front_styles');
 		add_action('wp_head', 'load_only_front_scripts');
@@ -341,6 +338,9 @@ class CPM_Post_Type{
 
 			wp_register_script('cu_pr_admin_script_from_this', plugins_url('/assets/js/cu_pr_admin_scripts.js', __FILE__));  
    			wp_enqueue_script('cu_pr_admin_script_from_this');
+
+			wp_register_script('woo_admin_script_from_this', plugins_url('/wc-extension/wc-admin-extension.js', __FILE__));  
+   			wp_enqueue_script('woo_admin_script_from_this');
 
    			wp_enqueue_script('editor');
 		    wp_enqueue_script('thickbox');
@@ -412,9 +412,15 @@ function register_cpm_post_type(){
 	include_once(CPM_PLUGIN_PATH . 'lib/cpm_email.php');
 	require_once(CPM_PLUGIN_PATH . 'lib/cpm_metaboxes.php');
 	require_once(CPM_PLUGIN_PATH . 'lib/cpm_templates.php');
+	require_once(CPM_PLUGIN_PATH . 'lib/downloadable_photo.php');
+	require_once(CPM_PLUGIN_PATH . 'lib/cpm_secret_code.php');
 	require_once(ABSPATH. 'wp-content/plugins/woocommerce/woocommerce.php');
+	require_once(CPM_PLUGIN_PATH. 'wc-extension/wc-extension.php');
 
 	new CPM_Post_Type();
 	new CPM_Metaboxes();
 	new CPM_Templates();
+	new CPM_WC();
+	new CFA_Downloadable_Photos();
+	new CPM_Secret_Code();
 }	
