@@ -281,3 +281,20 @@ function cpm_generate_secret_code_cb(){
 
 	die();
 }
+
+add_action( 'wp_ajax_cpm_send_invoice_email', 'cpm_send_invoice_email_cb' );
+
+function cpm_send_invoice_email_cb(){
+	$ret = array( 'status' => false );
+
+	if( isset($_POST['order_id']) && (int)$_POST['order_id'] > 0){
+		woocommerce_pip_send_email($_POST['order_id'], true);
+
+		$ret['status'] = true;
+		$ret['msg'] = 'email sent';
+	}
+
+	wp_send_json($ret);
+	die();
+}
+?>

@@ -5,7 +5,6 @@
 class CPM_WC
 {
 	public $coupon_applied;
-	public $is_coupon_user;
 	private $last_printed_invoice;
 
 	function __construct(){
@@ -14,12 +13,11 @@ class CPM_WC
 
 		$this->last_printed_invoice = $this->PIP_LastPrintedInvoice();
 
-		$this->coupon_applied = isset($woocommerce->cart->applied_coupons) && is_array($woocommerce->cart->applied_coupons) && !empty($woocommerce->cart->applied_coupons);
-		$this->is_coupon_user = isset($_GET['coupon_user']) && $_GET['coupon_user'] == 'true';
-
+		//$this->coupon_applied = isset($woocommerce->cart->applied_coupons) && is_array($woocommerce->cart->applied_coupons) && !empty($woocommerce->cart->applied_coupons);
+		$this->coupon_applied = isset($_COOKIE['coupon_activated']) && !empty($_COOKIE['coupon_activated']);
+		
 		$this->RenameDownloadImage();
 		$this->AddHoverThumb();
-		$this->AskCouponCode();
 
 
 		/*
@@ -50,6 +48,10 @@ class CPM_WC
 		if( $this->coupon_applied ){
 			remove_action( 'woocommerce_checkout_order_review', 'woocommerce_order_review' );
 			add_action( 'woocommerce_checkout_order_review', array(&$this, 'RemoveReviewPrice'), 10 );
+
+			if( $_COOKIE['coupon_activated'] == 'T' ){
+				add_action( 'wp_head', array(&$this, 'PrintCouponCode') );
+			}
 		}
 
 		setcookie("trial_user", '', time()+3600, '/');
@@ -194,38 +196,14 @@ class CPM_WC
 		}
 	}
 
-	public function AskCouponCode(){
-		global $woocommerce;
-
-		if( !$this->is_coupon_user ){
-			add_action( 'wp_head', array($this, 'PrintCouponCode') );
-		}else{
-			add_action( 'wp_footer', array( $this, 'PrintCouponForm' ) );
-		}
-	}
-
-	public function PrintCouponForm(){
-		global $woocommerce;
-		$cart_url = $woocommerce->cart->get_cart_url();
-		?>
-			<!--<div id="coupon_code_request_wrapper">
-				<div id="coupon_code_request">
-					<span class="shop-redirect-url" data-shop="<?php echo get_permalink( woocommerce_get_page_id( 'shop' ) );?>"></span>
-					<input class="input-text" id="coupon_code" type="text" name="coupon_code" placeholder="Inserisci il codice" value="" />
-					<input class="button" type="submit" name="apply_coupon" value="Attiva" />
-				</div>
-			</div>-->
-		<?php
-	}
-
-	public static function ApplyShopCoupon($coupon_code){
+	public static function ApplyShopCoupon($coupon_code, $code_type){
 		global $woocommerce;
 
 		if( strlen( $coupon_code ) > 0 ){
 			$smart_coupon = new WC_Coupon( $coupon_code );
 	        if ( $smart_coupon->is_valid() ) { // && $smart_coupon->type=='smart_coupon'
 
-				setcookie("coupon_activated", 'true', time()+3600, '/');
+				setcookie("coupon_activated", $code_type, time()+3600, '/');
 	        	$apply_cookie = setcookie('coupon_code', $coupon_code, time()+60*60*24, '/');
 	        	$apply_coupon = $woocommerce->cart->add_discount( sanitize_text_field( $coupon_code ));
 
@@ -384,6 +362,10 @@ class CPM_WC
 				<p>
 					<a <?php echo $button_class; ?> href="<?php echo wp_nonce_url(admin_url('?print_pip=true&post='.$post->ID.'&type=print_invoice'), 'print-pip'); ?>"><?php _e('Print invoice', 'woocommerce-pip'); ?></a>
 	  				<a <?php echo $button_class; ?> href="<?php echo wp_nonce_url(admin_url('?print_pip=true&post='.$post->ID.'&type=print_packing'), 'print-pip'); ?>"><?php _e('Print packing list', 'woocommerce-pip'); ?></a>
+
+					<?php if( self::OnlyProduct( 5367, 'order', $post->ID ) ): ?>
+	  					<input type="button" value="<?php echo __( 'Send Email', 'woocommerce' ); ?>" class="button button-primary" id="cpm_send_invoice_email">
+          			<?php endif; ?>
   				</p>
   				<?php
 			}else{
@@ -436,11 +418,40 @@ class CPM_WC
 		  <?php } ?>
 			<tr>
 				<td>
-					<?php $this->PIP_PrintButtons( $order, $post ); ?>
+					<?php 
+						$this->PIP_PrintButtons( $order, $post ); 
+					?>
           		</td>
 			</tr>
 		</table>
 		<?php
+	}
+
+	public static function OnlyProduct( $product_id, $in, $order_id = 0 ){
+		if( $in == 'order' && $order_id > 0 ){
+			global $post;
+			$order = new WC_Order( $order_id );
+			$tot_items = $order->get_item_count();
+			$item = reset( $order->get_items() );
+
+			return ( $tot_items == 1 && in_array( $product_id, $item['item_meta']['_product_id'] ) );
+		}elseif( $in == 'cart' ){
+			$i = 0;
+			global $woocommerce;
+
+			foreach($woocommerce->cart->get_cart() as $cart_item_key => $values ) {
+				$_product = $values['data'];
+			
+				if( 5367 == $_product->id ) {
+					$regala = true;
+				}
+				++$i;
+			}
+
+			return ( $i === 1 && $regala === true );
+		}
+
+		return false;
 	}
 
 	//finds first completed order whose invoice hasn't been printed yet

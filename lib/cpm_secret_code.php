@@ -11,7 +11,7 @@ class CPM_Secret_Code{
 		$this->code_types = array(
 			'A' => 'Try And Buy',
 			'F' => 'Photo Download',
-			'T' => 'Regala Auronia'
+			'T' => 'Regala Auronia',
 		);
 		$this->code_post_type = 'cpm_secret_code';
 		$this->code_post_statuses = array(
@@ -190,12 +190,32 @@ class CPM_Secret_Code{
 								CFA_Downloadable_Photos::redirect_from_secret_code($secret_code);
 								break;
 							case 'T':
-								$applied = CPM_WC::ApplyShopCoupon($secret_code);
+								$applied = CPM_WC::ApplyShopCoupon($secret_code, 'T');
 								if( $applied == true){
 										$_SESSION['cpm_secret_code_error'] = false;
 										wp_redirect( get_permalink(woocommerce_get_page_id( 'shop' )) );
 								}else{
-									$_SESSION['cpm_secret_code_error'] = __('Il codice coupon non è valido!');
+									$_SESSION['cpm_secret_code_error'] = __('Il secret code non è valido!', 'woocommerce');
+								}
+
+								break;
+							case 'B':
+								$applied = CPM_WC::ApplyShopCoupon($secret_code, 'B');
+								if( $applied == true){
+										$_SESSION['cpm_secret_code_error'] = false;
+										wp_redirect( get_permalink(woocommerce_get_page_id( 'shop' )) );
+								}else{
+									$_SESSION['cpm_secret_code_error'] = __('Il secret code non è valido!', 'woocommerce');
+								}
+
+								break;
+							case 'E':
+								$applied = CPM_WC::ApplyShopCoupon($secret_code, 'E');
+								if( $applied == true ){
+										$_SESSION['cpm_secret_code_error'] = false;
+										wp_redirect( get_permalink(woocommerce_get_page_id( 'shop' )) );
+								}else{
+									$_SESSION['cpm_secret_code_error'] = __('Il secret code non è valido!', 'woocommerce');
 								}
 
 								break;
@@ -215,10 +235,10 @@ class CPM_Secret_Code{
 	public function get_code_type($code){
 		$code_initial = substr($code, 0, 1);
 
-		if( array_key_exists($code_initial, $this->code_types) )
+		//if( array_key_exists($code_initial, $this->code_types) )
 			return $code_initial;
-		else
-			return false;
+		//else
+			//return false;
 	}
 
 	public function deactivate_secret_code($code_id){

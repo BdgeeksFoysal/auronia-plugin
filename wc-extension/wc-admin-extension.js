@@ -89,4 +89,25 @@ jQuery(function($){
                 }
             }, 'json');
     };
+
+    //invoice html email
+    $('input#cpm_send_invoice_email').on('click', function (e) {
+        e.preventDefault();
+        var data = {
+                'action' : 'cpm_send_invoice_email',
+                'order_id' : $('input#post_ID').val()
+            },
+            $this = $(this);
+
+        PostForm.showSpinner($this.parent());
+
+        jQuery.post(ajaxurl, data, function(ret){
+           if(ret.status == true){
+                $this.siblings('.spinner').delay(1300).remove();
+                $this.parent().append(ret.msg);
+            }else{
+                $this.parent().append('Error!');
+            }
+        }, 'json');
+    });
 });

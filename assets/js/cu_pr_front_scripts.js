@@ -61,7 +61,8 @@ jQuery(document).ready(function($) {
 
 
 	$(document).on('#product_chosen', function(e, item, img, img_id){
-		var share_uri = 'http://dev.auronia.it/?attachment_id='+img_id;
+		//var share_uri = 'http://dev.auronia.it/?attachment_id='+img_id;
+		var share_uri = window.location.href;
 
 		$('.cu_pr-available_images').fadeOut(250);
 		$('.cu_pr-chosen-img').html('<img src="'+ img +'" class="aligncenter">');
@@ -82,44 +83,8 @@ jQuery(document).ready(function($) {
 		$('.cu_pr-available_images').delay(200).fadeIn(300);
 	});
 
-	if(_CC == 0){
-		var form = $('#coupon_code_request'),
-			coupon_form = $('.checkout_coupon'),
-			shop_url = $('.shop-redirect-url').data('shop');
-
-		form.on('click', 'input[name="apply_coupon"]', function(e){
-
-			e.preventDefault();
-			PostCoupon(form);
-
-		}).on('keypress', function(e){
-
-			if(e.which == 13){
-				coupon_form.submit();
-				PostCoupon(form);
-			}
-
-		});
-
-		var PostCoupon = function (form) {
-			var data = {
-					coupon_code : form.find('input[name="coupon_code"]').val(),
-					action	: 'cu_pr_coupon_code'
-				};
-
-			form.append('<p>Applying Coupon.....</p>');
-
-			$.post(CPM_Ajax.ajaxurl, data, function (ret) {
-				window.location.href = $('.shop-redirect-url').data('shop') + '?cu_pr_applied_coupon=true';
-				console.log(ret);
-			});
-		};
-	}else if(_CC == 1){
-		if($('body').hasClass('woocommerce-cart')){
-			//$('#coupon_code').val(coupon_code).next().trigger('click');
-		}
+	if(typeof _CC !== 'undefined' &&  _CC == 1){
 		$('.price, .amount').text('Gratis');
-
 	}
 
 });

@@ -1,6 +1,8 @@
 <?php
 function print_social_btns($image = NULL){
-	$share_uri = ($image == NULL) ? '#' : 'http://dev.auronia.it/?attachment_id='.$image['id'];
+	global $post;
+	//$share_uri = ($image == NULL) ? '#' : 'http://www.auronia.it/?attachment_id='.$image['id'];
+	$share_uri = get_permalink( $post->ID );
 	$fb_share_uri = ($image == NULL) ? '#' : 'https://facebook.com/sharer/sharer.php?u='.$share_uri;
 	$gplus_share_uri = ($image == NULL) ? '#' : 'https://plus.google.com/share?url='.$share_uri;
 	$twitter_share_uri = ($image == NULL) ? '#' : 'http://twitter.com/intent/tweet?source=auronia.it&url='.$share_uri;

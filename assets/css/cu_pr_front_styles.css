@@ -9,7 +9,7 @@
 #cu_pr_preview .thumbnail {
     border: 2px solid #000000;
     border-radius: 0 0 0 0;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     padding: 0;
     position: relative;
 }
@@ -27,8 +27,15 @@
 	display: block;
     padding: 20px 10px;
 } 
-
-
+#cu_pr_preview .nota {
+   font-weight: 500;
+   border-bottom: 1px solid;
+   padding-bottom: 10px;
+   line-height: normal;
+}
+div.pp_woocommerce .pp_close {
+	right: 0 !important;
+}
 #gift-certificate-receiver-form{
 	display: none;
 }
@@ -45,6 +52,10 @@
 	/* -webkit-box-shadow: 0px 10px 12px -8px #757575;
 	        box-shadow: 0px 10px 12px -8px #757575;
 	 */
+}
+.license {
+	padding-bottom: 20px;
+	font-size: 12px;
 }
 .cu_pr-select-item p,
 .cu_pr-product_chosen,

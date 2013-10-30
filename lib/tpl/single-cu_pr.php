@@ -15,8 +15,8 @@
 
 				$wc_order = new WC_Order($order_id);
 				$qty = $wc_order->get_item_meta($item_id, '_qty');
-			//if(!$chosen || empty($chosen)):
-			if(true):
+				
+				if(!$chosen || empty($chosen)):
 			?>  
 			<div class="row cu_pr-available_images">
 				<input type="hidden" value="<?php echo $item_id; ?>" name="cu_pr_item_id">
@@ -26,7 +26,7 @@
 				<?php cu_pr_print_fantasia_header($tpl); ?>
 
 				<!--<ul class="clearfix available-image-list">-->
-				<div class="col-md-8 col-sm-8 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-2">
+				<div class="col-md-12 col-sm-12 col-xs-12">
 					<div class="row">
 					<?php 
 						$i = 1;
@@ -41,7 +41,7 @@
 								
 
 								<a href="<?php echo $img['sizes']['large']; ?>" rel="prettyPhoto">
-									<img class="img-responsive" src="<?php echo $img['sizes']['large']; ?>" alt="Questa è l'anteprima del tuo ordine">
+									<img class="img-responsive" src="<?php echo $img['sizes']['large']; ?>" alt="<?php the_field($img_field_name.$i.'_title'); ?>">
 								</a>
 								
 								<div class="cu_pr-select-item caption text-center">
@@ -59,6 +59,12 @@
 									</p>
 								</div>
 							</div>
+						<?php if (get_field($img_field_name.$i.'_note')): ?>
+							<p class="nota">
+								<i>Dettagli proposta:</i>
+								<?php the_field($img_field_name.$i.'_note'); ?>
+							</p>
+						<?php endif; ?>
 						</div>
 						<!--</li>-->
 					<?php ++$i; endwhile; ?>
@@ -78,13 +84,15 @@
 					t-shirt proprio come la desideri. 
 					</div>
 				</div>
-
+				<p class="text-center license">
+					<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.it"><img alt="Licenza Creative Commons" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png" /></a><br />Quest'opera è distribuita con Licenza <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.it">Creative Commons Attribuzione - Non commerciale - Non opere derivate 3.0 Unported</a>.
+				</p>
 			</div>	
 
 			<div class="clearfix"></div>
 			
 			<div class="cu_pr-product_chosen row">	
-				<div class="col-md-12">
+				<div class="col-md-12 text-center">
 					<h1 class="text-center">Anteprima del tuo ordine</h1>
 					<figure class="text-center cu_pr-chosen-img"></figure>
 					<div class="privacy-terms">
@@ -92,12 +100,12 @@
 							$privacy_txt_lang = get_post_meta(get_the_ID(), 'privacy_txt', TRUE);
 							
 							$privacy_txt = ($privacy_txt_lang == 'it') ? 'cpm_privacy_txt_it' : 'cpm_privacy_txt_en';
-							$privacy_txt = get_option($privacy_txt); 
+							$privacy_txt = stripslashes( get_option($privacy_txt) ); 
 
 							$conditions_txt_lang = get_post_meta(get_the_ID(), 'conditions_txt', TRUE);
 
 							$conditions_txt = ($conditions_txt_lang == 'it') ? 'cpm_conditions_txt_it' : 'cpm_conditions_txt_en';
-							$conditions_txt = get_option($conditions_txt); 
+							$conditions_txt = stripslashes( get_option($conditions_txt) ); 
 						?>
 						<input type="checkbox" name="privacy_terms" value="true"> 
 						<div><?php echo $privacy_txt; ?></div>
@@ -117,7 +125,7 @@
 			<div class="clearfix"></div>
 
 			<div class="cu_pr-order_submitted row">
-				<div class="col-md-12">
+				<div class="col-md-12 text-center">
 					<h1 class="submission-complete-msg">Fai vedere ai tuoi amici la tua creazione!</h1>
 					<figure class="text-center  cu_pr-chosen-img"></figure>
 					<h3 class="submission-complete-msg">Condividi la tua grafica unica con tutti</h3>
@@ -128,7 +136,7 @@
 			<?php else: ?>
 				<div class="row">
 					<?php $img1 = get_field($chosen); if($img1): ?>
-					<div class="col-md-12">
+					<div class="col-md-12 text-center">
 						<figure>
 							<a href="<?php echo $img1['sizes']['large']; ?>" rel="prettyPhoto">
 								<img src="<?php echo $img1['sizes']['large']; ?>" alt="preview image of the customized product">

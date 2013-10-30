@@ -152,15 +152,26 @@ class CPM_Metaboxes{
 				<select name="cu_pr_order_id" id="cu_pr_order_id" class="required chzn-select">
 					<option value="">Choose An Order Id</option>
 			<?php
+				//super hack!
+				global $post;
+				$original_post = $post;
+				$orders = new WP_Query(array(
+					'post_type'	=> 'shop_order'
+				));
+
 				if( $orders->have_posts() ){
 					while( $orders->have_posts() ){
 						$orders->the_post(); 
+						var_dump('inside', $post->ID, $original_post->ID);
 						$woo_order = new WC_Order( get_the_ID() );
 						$selected = ($this_order_id == $woo_order->id) ? 'selected="selected"' : ''; 
 
 						echo '<option value="'. $woo_order->id .'" '. $selected .'>Order #'. $woo_order->id .'</option>';
 					}
 				}
+
+				setup_postdata( $original_post );
+				$post = $original_post;
 			?>		
 				</select>
 			</div>
