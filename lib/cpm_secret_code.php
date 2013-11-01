@@ -131,9 +131,8 @@ class CPM_Secret_Code{
 
 				if( $existing_code->have_posts() ){
 					$code_exists = 1;
-				}
-				else{
-					if( $this->insert_secret_code($code) === 1)
+				}else{
+					if( $this->insert_secret_code($code, $for) === 1)
 						array_push($codes, $code);
 				}
 			}while($code_exists == 1);
@@ -142,7 +141,7 @@ class CPM_Secret_Code{
 		return $codes;
 	}
 
-	private function insert_secret_code($code){
+	private function insert_secret_code($code, $for){
 		$secret_code_id = wp_insert_post(array(
 		  'post_title'	=> $code,
 		  'post_status'	=> 'active_secret_code',
@@ -150,6 +149,7 @@ class CPM_Secret_Code{
 		));
 
 		if( $secret_code_id > 0 ){
+			add_post_meta( $secret_code_id, 'code_type', $for, true );
 			return 1;
 		}else{
 			return 0;
@@ -161,6 +161,10 @@ class CPM_Secret_Code{
 
 	    if ( $cpm_secret_code = $wp_query->get( 'cpm_secret_code' ) ) {
 	        $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \'' . esc_sql( like_escape( $cpm_secret_code ) ) . '%\'';
+	    }
+
+	    if ( $cpm_secret_code_date_after = $wp_query->get( 'cpm_secret_code_date_after' ) ) {
+	        $where .= ' AND ' . $wpdb->posts . '.post_date > \'' . esc_sql( like_escape( $cpm_secret_code_date_after ) ) . '\'';
 	    }
 
 	    return $where;
@@ -263,5 +267,31 @@ class CPM_Secret_Code{
 		}
 
 		echo "}</script>";
+	}
+
+	public function export_secret_code($for, $after){
+		$codes = new WP_Query(array(
+			'post_type' => array( $this->code_post_type ),
+			'meta_key' 	=> 'code_type',
+			'meta_value'=> $for,
+			'cpm_secret_code_date_after' => $after
+		));
+
+		if( $codes->have_posts() ){
+			$dir = wp_upload_dir();
+			$filename = get_bloginfo( 'name' ) ."-secret-codes-". gmdate('d-M-Y_H_i_s') . ".csv";
+			$file = fopen( $dir['path'] ."/". $filename, 'w');
+
+			while ( $codes->have_posts() ) {
+				$codes->the_post();
+				fputcsv( $file, array( get_the_title() ) );
+			}
+
+			fclose($file);
+
+			return $dir['url'] ."/". $filename;
+		}
+
+		return false;
 	}
 }

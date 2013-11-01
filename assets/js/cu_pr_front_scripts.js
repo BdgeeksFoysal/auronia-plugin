@@ -10,8 +10,29 @@ jQuery(document).ready(function($) {
 		$(document).trigger(hash, [item, img, img_id]);
 	});
 
+	$('#confirm_choice_button').on('click', function(e){
+		var chosen = $('input[name="cu_pr_image_choice"]:checked'),
+			privacy = $('input[name="privacy_terms"]'),
+			conditions = $('input[name="conditions_terms"]');
+
+		if(privacy.is(':checked') && conditions.is(':checked')){
+			var popup = $('#confirm_choice_modal');
+
+			privacy.parent().css({'border' : '0 none'});
+
+			popup.find('.chosen-version-title').text(chosen.data('title'));
+			popup.modal('show');
+		}else{
+			//$this.after('<span class="error"> &nbsp; Devi accettare i termini e condizioni del servizio.</span>');
+			privacy.parent().css({
+				'border' : '1px solid red'
+			});
+		}
+	});
+
 	$('#submit_choice').on('click', function (e) {
 		//e.preventDefault();
+		$('#confirm_choice_modal').modal('hide');
 		var chosen = $('input[name="cu_pr_image_choice"]:checked'),
 			$this = $(this),
 			privacy = $('input[name="privacy_terms"]'),

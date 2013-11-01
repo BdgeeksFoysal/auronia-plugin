@@ -1,14 +1,16 @@
 <?php
-function cu_pr_print_fantasia_header($tpl){
+function cu_pr_print_fantasia_header($tpl, $order){
 	echo '<div class="fantasia-header">';
+	$nome = $order->billing_first_name;
+	$cognome = $order->billing_last_name;
 	if($tpl == 'capricci'):
 	?>
-		<p>
-			Una principessa dalla fluente chioma.<br />
-			Esprime i suoi desideri perché sa che l’unico modo per essere felice è imparare a chiedere
-			quello che la fa stare bene.
-		</p>
-		Ecco la tua Capricci creata apposta per te. A te la scelta!
+	<h2>
+		Cara 
+		<?php echo $nome ." ". $cognome; ?> , per il tuo ordine 
+		<?php echo $order->id; ?>
+	</h2>
+	<h1>ecco la TUA tshirt AURONIA</h1>
 	<?php
 
 	elseif($tpl == 'kiss-me'):
@@ -58,14 +60,7 @@ function cu_pr_print_fantasia_footer($tpl){
 
 	if($tpl == 'capricci'):
 	?>
-		La proposta Soft presenta un trattamento della tua immagine più 
-		delicato; nella proposta Cool invece i graphic designer hanno dato 
-		potenza solo ad alcuni dettagli del tuo viso e garantendo un risultato 
-		marcato ed impattante, artistico. Entrambe le proposte hanno una 
-		variante “plus” con una fantasia molto ricca, colma, quasi opulenta.
-		L’applicazione di strass e borchie qui rappresentata è indicativa 
-		in quanto il loro posizionamento sarà realizzato a mano, uno alla 
-		volta, nell’ultima fase di produzione della t-shirt. 
+	    Scegliendo la proposta creativa che preferisci darai il via alla produzione della tua t-shirt personalizzata. Mani esperte si metteranno all’opera per te, stampandola e impreziosendola con applicazioni e strass Swarovski® posizionati a mano seguendo i dettagli del tuo viso. 10 giorni e sarà tua!
 	<?php
 
 	elseif($tpl == 'kiss-me'):

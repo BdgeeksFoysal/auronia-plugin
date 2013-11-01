@@ -184,6 +184,7 @@ jQuery(function($){ //make sure DOM is loaded and pass $ for use
 
     //adds export, quick generate option ad the top
     if(typenow == 'cpm_secret_code' && adminpage == 'edit-php'){
+        //generate
         var $code_type_selector = '<select name="code_for">';
 
         $.each(CPM_Secret_Code_Types, function(value, label){
@@ -208,8 +209,8 @@ jQuery(function($){ //make sure DOM is loaded and pass $ for use
             if(total.length > 0 && code_for.length > 0){
                 var $this = $(this),
                     data = {
-                        action : 'cpm_generate_secret_code',
-                        total  : total,
+                        action  : 'cpm_generate_secret_code',
+                        total   : total,
                         code_for : code_for
                     };
 
@@ -220,6 +221,43 @@ jQuery(function($){ //make sure DOM is loaded and pass $ for use
                         $this.siblings('.spinner').delay(1300).remove();
 
                         window.reload();
+                    }else{
+                        $this.parent().append(ret.msg);
+                    }
+                }, 'json');
+            }
+        });
+
+        //export
+        var $export_button = $('<p class="search-box" style="margin-left:10px">'
+            +'<input type="text" name="code_from_date" placeholder="generato dopo...">'
+            +$code_type_selector
+            +'<input type="submit" name="" id="export_cpm_secret_code" class="button" value="Export">'
+            +'</p>');
+
+        $('#posts-filter').prepend($export_button);
+        $export_button.find('input[name="code_from_date"]').datepicker({ dateFormat: 'yy-mm-dd' });
+
+        $export_button.on('click', '#export_cpm_secret_code', function (e) {
+            e.preventDefault();
+            var code_from_date = $(this).siblings('input[name="code_from_date"]').val(),
+                code_for = $(this).siblings('select[name="code_for"]').find('option:selected').val();
+            
+            if(code_for.length > 0 && code_from_date.length > 0){
+                var $this = $(this),
+                    data = {
+                        action          : 'cpm_export_secret_code',
+                        code_for        : code_for,
+                        code_from_date  : code_from_date
+                    };
+
+                PostForm.showSpinner($this.parent());
+                
+                jQuery.post(ajaxurl, data, function(ret){
+                    $this.siblings('.spinner').delay(1300).remove();
+                    
+                   if(ret.status == true){
+                        window.location.href = ret.url;
                     }else{
                         $this.parent().append(ret.msg);
                     }

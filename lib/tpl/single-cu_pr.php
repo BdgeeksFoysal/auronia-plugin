@@ -1,5 +1,4 @@
 <?php get_header(); ?>
-	
 	<?php if(have_posts()): while(have_posts()): the_post(); ?>
 	<div id="content" class="container cu_pr_preview">
 		<div id="cu_pr_preview" class="row">
@@ -16,14 +15,17 @@
 				$wc_order = new WC_Order($order_id);
 				$qty = $wc_order->get_item_meta($item_id, '_qty');
 				
-				if(!$chosen || empty($chosen)):
+				if(true):
+				//if(!$chosen || empty($chosen)):
 			?>  
 			<div class="row cu_pr-available_images">
 				<input type="hidden" value="<?php echo $item_id; ?>" name="cu_pr_item_id">
 				<input type="hidden" value="<?php echo $order_id; ?>" name="cu_pr_order_id">
 				<input type="hidden" value="<?php echo get_the_ID(); ?>" name="cu_pr_id">
 				
-				<?php cu_pr_print_fantasia_header($tpl); ?>
+				<div class="col-md-12 text-center">
+					<?php cu_pr_print_fantasia_header($tpl, $wc_order); ?>
+				</div>
 
 				<!--<ul class="clearfix available-image-list">-->
 				<div class="col-md-12 col-sm-12 col-xs-12">
@@ -54,7 +56,11 @@
 										Scegli
 									</a>
 									<p>
-										<input type="radio" name="cu_pr_image_choice" value="<?php echo $img_field_name.$i; ?>"> 
+										<input 
+											type="radio" 
+											name="cu_pr_image_choice" 
+											value="<?php echo $img_field_name.$i; ?>"
+											data-title="<?php the_field($img_field_name.$i.'_title'); ?>"> 
 										Choose This Design
 									</p>
 								</div>
@@ -72,16 +78,11 @@
 					</div>
 				</div>
 				<div class="clearfix"></div>
-				<?php cu_pr_print_fantasia_footer($tpl); ?>
+				<div class="col-md-12"><?php cu_pr_print_fantasia_footer($tpl); ?></div>
 
 				<div class="row cu_pr-prod-notice">
-					<div class="col-md-12">
-					Se nessuna delle proposte creative dovesse piacerti, 
-					per piacere contattaci alla casella di posta servizio.clienti@auronia.it e indicaci 
-					come vorresti che AURONIA realizzasse il trattamento della 
-					tua immagine. Provvederemo a creare delle nuove proposte 
-					più in linea con la tua personalità per realizzare la tua 
-					t-shirt proprio come la desideri. 
+					<div class="col-md-12 text-center">
+					Non sei soddisfatta del lavoro del nostro team creativo? Segnalacelo all’indirizzo e-mail servizioclienti@auronia.it indicandoci il tuo numero d’ordine e le tue preferenze. Vogliamo che tu sia soddisfatta del lavoro che facciamo per te e quindi ti chiediamo di aiutarci a farlo al meglio. Ci rimetteremo all’opera sulla tua immagine per garantirti un risultato all’altezza delle tue aspettative. 
 					</div>
 				</div>
 				<p class="text-center license">
@@ -117,7 +118,7 @@
 					<div class="clearfix"></div>
 					<div class="text-center ">
 						<a href="#" class="btn btn-default" id="back_to_cu_pr_available_images">&laquo; Indietro</a>
-						<a href="#order_submitted" class="btn btn-default" id="submit_choice">Invia ordine &raquo;</a>
+						<a href="#" id="confirm_choice_button" class="btn btn-default">Invia ordine &raquo;</a>
 					</div>
 				</div>
 			</div>
@@ -133,6 +134,26 @@
 				</div>
 			</div>
 
+			<!-- Modal -->
+			<div class="modal fade" id="confirm_choice_modal" tabindex="-1" role="dialog" aria-labelledby="confirm_choice_modal_label" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="confirm_choice_modal_label">Conferma La Scelta</h4>
+						</div>
+						<div class="modal-body">
+							<p>
+								Hai scelto la <span class="chosen-version-title"></span>. Ora daremo il via alla produzione della tua t-shirt personalizzata.
+							</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Cancella</button>
+							<button type="button" href="#order_submitted" id="submit_choice" class="btn btn-default">Conferma</button>
+						</div>
+					</div><!-- /.modal-content -->
+				</div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
 			<?php else: ?>
 				<div class="row">
 					<?php $img1 = get_field($chosen); if($img1): ?>

@@ -349,7 +349,15 @@ class CPM_WC
 	 */
 	private function PIP_PrintButtons($the_order, $post){
 		if( ((int)$the_order->order_total !== 0) ){
-			if ( in_array( $the_order->status, array('completed') ) && ($post->ID <= $this->last_printed_invoice) ) {
+			$coupons = $the_order->get_used_coupons();
+			$t_coupon = false;
+
+			for ($i=0; $i < count($coupons) && $t_coupon == false; $i++) { 
+				if ( preg_match('/^T/i', $codice[$i]) == 1 ) 
+					$t_coupon = true;
+			}
+
+			if ( in_array( $the_order->status, array('completed') ) && !$t_coupon ) {
 				$button_class = 'class="button pip-link';
 				$invoice_id = get_post_meta( $post->ID, '_pip_invoice_number', true );
 
@@ -463,8 +471,8 @@ class CPM_WC
 			'meta_query' => array(
 				array(
 					'key' => '_pip_invoice_number',
-					'value' => "",
-					'compare' => 'NOT EXISTS',
+					'value' => 0,
+					'compare' => '>',
 				)
 			),
 			'shop_order_status' => 'completed',

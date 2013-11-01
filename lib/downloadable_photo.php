@@ -10,6 +10,8 @@ class CFA_Downloadable_Photos{
 	public function __construct(){
 		$this->post_type = 'downloadable_photo';
 		$this->register_post_type();
+
+		add_filter( 'template_include', array(&$this, 'downloadable_photo_page_template'), 99 );
 	}
 
 	public function register_post_type(){
@@ -62,4 +64,12 @@ class CFA_Downloadable_Photos{
 		}
 	}
 
+	public function downloadable_photo_page_template( $template ){
+	    $post_types = array( 'downloadable_photo' );
+
+	    if(is_singular($post_types) && ! file_exists(get_stylesheet_directory() . '/single-downloadable_photo.php'))
+	        $template = CPM_PLUGIN_PATH . 'lib/tpl/single-downloadable_photo.php';
+
+	    return $template;
+	}
 }

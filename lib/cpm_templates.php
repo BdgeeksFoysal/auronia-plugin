@@ -81,6 +81,7 @@ class CPM_Templates{
 				<li data-sc="{{custom_product_url}}">Custom Product Url</li>
 				<li data-sc="{{product_name}}">Product Name</li>
 				<li data-sc="{{chosen_image_name}}">Chosen Image Name</li>
+				<li data-sc="{{chosen_image_url}}">Chosen Image Url</li>
 			</ol>
 		</div>
 		<a href="#TB_inline?width=250&height=200&inlineId=cpm_email_shortcode" class="thickbox" id="cpm_email_shortcode_popup_trig"></a>

@@ -34,6 +34,7 @@ class CPM_Email
 
 	public function apply_email_shortcodes($content){
 		$chosen_item = get_post_meta($this->cu_pr_id, 'cu_pr_chosen_img', TRUE);
+		$img = get_field($chosen_item, $this->cu_pr_id);
 
 		$shortcodes = array(
 			'/{{order_id}}/', 
@@ -41,7 +42,8 @@ class CPM_Email
 			'/{{customer_cognome}}/',
 			'/{{custom_product_url}}/',
 			'/{{product_name}}/',
-			'/{{chosen_image_name}}/'
+			'/{{chosen_image_name}}/',
+			'/{{chosen_image_url}}/',
 		);
 
 		$sc_subs = array(
@@ -50,7 +52,8 @@ class CPM_Email
 			$this->order->shipping_last_name,
 			get_permalink($this->cu_pr_id),
 			$this->prod_name,
-			get_field($chosen_item.'_title', $this->cu_pr_id)
+			get_field($chosen_item.'_title', $this->cu_pr_id),
+			$img['sizes']['large'],
 		);
 		
 		$content = preg_replace($shortcodes, $sc_subs, $content);

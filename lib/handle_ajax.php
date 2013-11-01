@@ -297,4 +297,35 @@ function cpm_send_invoice_email_cb(){
 	wp_send_json($ret);
 	die();
 }
+
+//ajax action that creates a secret code based on type of request
+add_action('wp_ajax_cpm_export_secret_code', 'cpm_export_secret_code_cb');
+
+function cpm_export_secret_code_cb(){
+	$ret = array('status' => false);
+	extract($_POST);
+
+	if( isset($code_for) && !empty($code_for) && isset($code_from_date) && !empty($code_from_date) ){
+		$secret_code = new CPM_Secret_Code();
+
+		if( array_key_exists($code_for, $secret_code->code_types) ){
+			$exported = $secret_code->export_secret_code($code_for, $code_from_date);
+			
+			if( $exported ){
+				$ret['status'] = true;
+				$ret['url'] = $exported;
+			}else{
+				$ret['msg'] = __( 'Non ci sono codice da esportare!', 'woocommerce' );
+			}
+		}else{
+			$ret['msg'] = 'request is not valid!';
+		}
+	}
+
+	wp_send_json($ret);
+
+	die();
+}
+
+
 ?>

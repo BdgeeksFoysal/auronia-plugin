@@ -26,10 +26,12 @@ class CPM_Post_Type{
 		$this->add_custom_columns();
 		$this->add_custom_filters();
 		$this->generate_default_title();
-		$this->redirect_to_cu_pr_tpl();
 
 		//hides wordpress update notification
 		add_filter( 'pre_site_transient_update_core', create_function( '$a', "return null;" ) );
+
+		//redirects page template for customized product
+		add_filter( 'template_include', array(&$this, 'cu_pr_single_page_template'), 99 );
 		//$this->taxonomies();
 	}
 
@@ -324,6 +326,8 @@ class CPM_Post_Type{
 	    	wp_enqueue_style('cu_pr_style_from_this');
 
 	    	wp_enqueue_style('thickbox');
+	    	wp_enqueue_style( 'jquery-ui-datepicker', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css' );
+
 		}
 
 		function load_only_admin_scripts(){
@@ -345,6 +349,7 @@ class CPM_Post_Type{
    			wp_enqueue_script('editor');
 		    wp_enqueue_script('thickbox');
 			wp_enqueue_script('media-upload');
+			wp_enqueue_script( 'jquery-ui-datepicker' );
 		}
 
 		function load_only_front_styles(){
@@ -367,17 +372,13 @@ class CPM_Post_Type{
 	}
 
 	//function to set custom template for the image page
-	public function redirect_to_cu_pr_tpl(){
-		add_filter( 'template_include', 'my_plugin_templates' );
+	public function cu_pr_single_page_template( $template ) {
+	    $post_types = array( 'cu_pr' );
 
-		function my_plugin_templates( $template ) {
-		    $post_types = array( 'cu_pr' );
+	    if(is_singular($post_types) && ! file_exists(get_stylesheet_directory() . '/single-cu_pr.php'))
+	        $template = CPM_PLUGIN_PATH . 'lib/tpl/single-cu_pr.php';
 
-		    if(is_singular($post_types) && ! file_exists(get_stylesheet_directory() . '/single-cu_pr.php'))
-		        $template = CPM_PLUGIN_PATH . 'lib/tpl/single-cu_pr.php';
-
-		    return $template;
-		}
+	    return $template;
 	}
 
 	//function to alter/modify necessary woocommerce settings
