@@ -48,47 +48,27 @@ class CPM_WC
 		if( $this->coupon_applied ){
 			remove_action( 'woocommerce_checkout_order_review', 'woocommerce_order_review' );
 			add_action( 'woocommerce_checkout_order_review', array(&$this, 'RemoveReviewPrice'), 10 );
+			add_action( 'woocommerce_thankyou', array(&$this, 'RemoveSecretCodeCookie'), 10 );
 
 			if( $_COOKIE['coupon_activated'] == 'T' ){
 				add_action( 'wp_head', array(&$this, 'PrintCouponCode') );
 			}
 		}
 
-		setcookie("trial_user", '', time()+3600, '/');
 		if( isset($_COOKIE['trial_user']) && $_COOKIE['trial_user'] == 'true' ){
-			add_filter( 'woocommerce_checkout_fields' , array(&$this, 'ModifyCheckoutFields') );
-			add_filter( 'woocommerce_available_payment_gateways' , array(&$this, 'ModifyPaymentFields') );
-			add_filter( 'woocommerce_order_button_text', array(&$this, 'ModifyOrderButtonText') );
-			add_filter( 'woocommerce_cart_product_subtotal', array(&$this, 'ModifyCartProductSubtotal') );
-			add_filter( 'woocommerce_cart_subtotal', array(&$this, 'ModifyCartProductSubtotal') );
-			add_filter( 'woocommerce_cart_total', array(&$this, 'ModifyCartProductSubtotal') );
 
-			//remove_action( 'woocommerce_checkout_order_review', 'woocommerce_order_review', 10 );
 		}
 
 	}
 
-	// Our hooked in function - $fields is passed via the filter!
-	public function ModifyCheckoutFields( $fields ) {
-	    $fields['order'] = array();
-	    $fields['shipping'] = array();
+	public function ModifyAddToCartButtonText($default){
+		// get custom text if set
+		$text = get_option( 'wc_pre_orders_add_to_cart_button_text' );
 
-	    //IMPORTANT!
-	    //hide the div with #ship-to-different-address, #shipping_address, #shiptobilling
-	    return $fields;
-	}
-
-	public function ModifyPaymentFields($gateways){
-		
-		return array('bacs' => $gateways['bacs']);
-	}
-
-	public function ModifyOrderButtonText($button_text){
-		return __( 'Try', 'woocommerce' );
-	}
-
-	public function ModifyCartProductSubtotal($amount){
-		return (double)"0";
+		if ( $text )
+			return $text;
+		else
+			return $default;
 	}
 
 	public function EditColumns( $columns ) {
@@ -138,7 +118,7 @@ class CPM_WC
 
 			case 'items_details' :
 				$items = $the_order->get_items();
-
+				var_dump($the_order->order_custom_fields['_wc_pre_orders_when_charged']);
 				foreach ( $items as $item ) {
 					//avoiding printing any error in case the version and taglia doesnt exist
 					$versions = @$item['item_meta']['Versione'];
@@ -252,11 +232,13 @@ class CPM_WC
 
 		$modified = preg_replace('#<span class="amount">.*</span>#', '<span class="amount">Gratis</span>', $table);
 		
-		setcookie("coupon_activated", '', time()+3600, '/');
 		echo $modified;
 	}
 
-	
+	public function RemoveSecretCodeCookie(){
+		setcookie( 'coupon_activated', false, time()+60*60*24, '/');
+		setcookie( 'trial_user', false, time()+60*60*24, '/');
+	}
 
 
 	//hiding the email box by default
@@ -292,7 +274,7 @@ class CPM_WC
 		
 		if ( is_checkout() ) {
 			if( ($items > $max) && $this->coupon_applied ){
-			 	$woocommerce->add_error( sprintf(__('Sorry, you can ONLY buy one product with the coupon. <a href="%s">Return to homepage &rarr;</a>', 'woocommerce'), home_url()) );
+			 	$woocommerce->add_error( sprintf(__('Attenzione, il codice regalo è valido per un solo prodotto.', 'woocommerce'), home_url()) );
 				wp_redirect( get_permalink( woocommerce_get_page_id( 'cart' ) ) );
 				exit;
 			}

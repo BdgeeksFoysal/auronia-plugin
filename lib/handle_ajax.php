@@ -31,6 +31,11 @@ function cu_pr_add_chosen_cb() {
 				$order->update_status('ready');
 			}
 
+			if( WC_Pre_Orders_Order::order_contains_pre_order( $order )  ){
+				WC_Pre_Orders_Manager::complete_pre_order( $order );
+				$ret['payment_url'] = $order->get_checkout_payment_url();
+			}
+
 			$item_uid = get_post_meta($_POST['cu_pr_id'], 'cu_pr_item_uid', TRUE);
 
 			foreach ($meta as $key => $value) {

@@ -54,6 +54,10 @@ jQuery(document).ready(function($) {
 						$('body, html').animate({
 							scrollTop: 0
 						}, 500);
+
+						if(typeof ret.payment_url != "undefined"){
+							$('.cu_pr-order_submitted').append('<p>' +ret.payment_url+ '</p>');
+						}
 					}
 				}, 'json');
 			}else{

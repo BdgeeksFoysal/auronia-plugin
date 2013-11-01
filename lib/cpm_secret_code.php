@@ -223,6 +223,12 @@ class CPM_Secret_Code{
 								}
 
 								break;
+							case 'A':
+							case 'C':
+							case 'D':
+								setcookie("trial_user", 'true', time()+3600, '/');
+								wp_redirect( get_permalink(woocommerce_get_page_id( 'shop' )) );
+								break;
 							default:
 								break;
 						}
