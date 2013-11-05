@@ -15,6 +15,7 @@ class CPM_WC
 
 		//$this->coupon_applied = isset($woocommerce->cart->applied_coupons) && is_array($woocommerce->cart->applied_coupons) && !empty($woocommerce->cart->applied_coupons);
 		$this->coupon_applied = isset($_COOKIE['coupon_activated']) && !empty($_COOKIE['coupon_activated']);
+		$this->trial_user = isset($_COOKIE['trial_user']) && $_COOKIE['trial_user'] == 'true';
 		
 		$this->RenameDownloadImage();
 		$this->AddHoverThumb();
@@ -23,6 +24,7 @@ class CPM_WC
 		/*
 		 *all action and filter hooks
 		 */
+		add_action( 'wp_head', array(&$this, 'PrintCouponCode') );
 		add_action( 'the_post', array(&$this, 'LimitCartForCouponUser') );
 		add_filter( 'manage_edit-shop_order_columns', array( &$this, 'EditColumns' ) );
 		add_action( 'manage_shop_order_posts_custom_column', array( &$this, 'ManageColumns' ) , 2, 2 );
@@ -33,32 +35,35 @@ class CPM_WC
         remove_action( 'manage_shop_order_posts_custom_column', 'woocommerce_pip_alter_order_actions', 3 );
         add_action( 'manage_shop_order_posts_custom_column', array( &$this, 'PIP_AlterOrderActions'), 3 );
         add_action( 'add_meta_boxes', array( &$this, 'PIP_AddBox') );
-  
-        if( isset($_COOKIE['coupon_activated']) && $_COOKIE['coupon_activated'] == 'true' ){                
+
+        //checkout header text
+		add_action( 'woocommerce_before_checkout_form', array(&$this, 'CheckOutTitle') );
+
+		/*
+		 *Remove the prices from the order review section of the checkout page if 
+		 *user applied a coupon or 
+		 *user is a trial user
+		 */
+		if( $this->trial_user ){
+			add_filter( 'add_to_cart_redirect', array( &$this, 'RedirectToCheckoutFromCart' ), 1 );
+			add_filter( 'woocommerce_add_to_cart_message', array(&$this, 'RemoveAddToCartMessage') );
+
+			add_action( 'woocommerce_new_order', array(&$this, 'RemoveTrialCode') );
+		}
+
+
+		if( $this->coupon_applied || $this->trial_user ){
 			remove_action( 'woocommerce_view_order', 'woocommerce_order_details_table', 10 );
 			remove_action( 'woocommerce_thankyou', 'woocommerce_order_details_table', 10 );
+			remove_action( 'woocommerce_checkout_order_review', 'woocommerce_order_review' );
 
 			add_action( 'woocommerce_view_order', array( &$this, 'RemoveOrderDetailPrice' ), 12 );
 			add_action( 'woocommerce_thankyou', array( &$this, 'RemoveOrderDetailPrice' ), 12 );
-		}
-		/*
-		 *Remove the prices from the order review section of the checkout page if 
-		 *user applied a coupon
-		 */
-		if( $this->coupon_applied ){
-			remove_action( 'woocommerce_checkout_order_review', 'woocommerce_order_review' );
 			add_action( 'woocommerce_checkout_order_review', array(&$this, 'RemoveReviewPrice'), 10 );
+
+			//remove all the cookies set for the secret code
 			add_action( 'woocommerce_thankyou', array(&$this, 'RemoveSecretCodeCookie'), 10 );
-
-			if( $_COOKIE['coupon_activated'] == 'T' ){
-				add_action( 'wp_head', array(&$this, 'PrintCouponCode') );
-			}
 		}
-
-		if( isset($_COOKIE['trial_user']) && $_COOKIE['trial_user'] == 'true' ){
-
-		}
-
 	}
 
 	public function ModifyAddToCartButtonText($default){
@@ -199,8 +204,10 @@ class CPM_WC
 		global $woocommerce;
 
 		$cc = $this->coupon_applied ? 1 : 0;
+		$coupon_code_trial = $this->trial_user ? 1 : 0;
 		echo '<script type="text/javascript">
 				var _CC = '. $cc .';
+				var _CCTU = '. $coupon_code_trial .';
 			</script>';
 	}
 
@@ -213,8 +220,16 @@ class CPM_WC
 		woocommerce_get_template( 'checkout/review-order.php', array( 'checkout' => $woocommerce->checkout() ) );
 		$table = ob_get_contents();
 		ob_end_clean();
+
+		if( $this->coupon_applied ){
+			$text = 'Gratis';
+			$modified = preg_replace('#<span class="amount">.*</span>#', '<span class="amount">'. $text .'</span>', $table);
+		}elseif( $this->trial_user ){
+			$text = 'Prova Gratuita';
+			$modified = preg_replace('#<tr class="cart-subtotal">.*<tr class="shipping">#s', '<tr class="shipping">', $table);
+			$modified = preg_replace('#<td class="product-total"><span class="amount">.*</span></td>#', '<td class="product-total"><span class="amount">'. $text .'</span></td>', $modified);
+		}
 		
-		$modified = preg_replace('#<span class="amount">.*</span>#', '<span class="amount">Gratis</span>', $table);
 		echo $modified;
 	}
 
@@ -224,22 +239,38 @@ class CPM_WC
 		global $woocommerce;
 
 		ob_start();
+
 		woocommerce_get_template( 'order/order-details.php', array(
 			'order_id' => $order_id
 		) );
 		$table = ob_get_contents();
+
 		ob_end_clean();
 
-		$modified = preg_replace('#<span class="amount">.*</span>#', '<span class="amount">Gratis</span>', $table);
-		
+		if( $this->coupon_applied ){
+			$text = 'Gratis';
+		}elseif( $this->trial_user ){
+			$text = 'Prova Gratuita';
+		}
+
+		//$modified = preg_replace('#^<span\sclass\="amount".*span>?( IVA\))#', '<span class="amount">'. $text .'</span>', $table);
+		$modified = preg_replace('#<span\sclass\="amount".*span>(?:\sIVA\))?#', '<span class="amount">'. $text .'</span>', $table);
 		echo $modified;
 	}
 
+	//remove all the cookies set related to secret code
 	public function RemoveSecretCodeCookie(){
 		setcookie( 'coupon_activated', false, time()+60*60*24, '/');
 		setcookie( 'trial_user', false, time()+60*60*24, '/');
+		setcookie( 'trial_code_id', false, time()+60*60*24, '/');
 	}
 
+	//remove trial code from admin panel
+	public function RemoveTrialCode($order_id){
+		if( isset($_COOKIE['trial_code_id']) && $_COOKIE['trial_code_id'] != false ){
+			CPM_Secret_Code::remove_secret_code($_COOKIE['trial_code_id']);
+		}
+	}
 
 	//hiding the email box by default
 	public function HideEmailBox(){
@@ -262,6 +293,32 @@ class CPM_WC
 			<?php
 			}
 		}
+	}
+
+	/*
+	 * Functions for CheckOut
+	 */
+	//redirect trial user directly to checkout page when a product is added to cart
+	public function RedirectToCheckoutFromCart($url){
+		global $woocommerce;
+		$new_url = $woocommerce->cart->get_checkout_url();
+		return $new_url;
+	}
+
+	//header title for checkout
+	public function CheckOutTitle() {
+		if( $this->trial_user ){
+			$title = '<h1>Richiedi la tua prova gratuita</h1>';
+	    }else{
+			$title = '<h1>Check-out</h1>';
+	    }
+
+	    echo '<div class="page-header text-center">'. $title .'</div>';
+	}
+
+	//remove product added to cart message if user is a trial user
+	public function RemoveAddToCartMessage($message){
+		return false;
 	}
 
 	/*

@@ -56,7 +56,7 @@ jQuery(document).ready(function($) {
 						}, 500);
 
 						if(typeof ret.payment_url != "undefined"){
-							$('.cu_pr-order_submitted').append('<p>' +ret.payment_url+ '</p>');
+							window.location.href = ret.payment_url;
 						}
 					}
 				}, 'json');
@@ -95,6 +95,19 @@ jQuery(document).ready(function($) {
 		$('.gplus-share-btn').attr('href', 'https://plus.google.com/share?url='+share_uri);
 		$('.twitter-share-btn').attr('href', 'http://twitter.com/intent/tweet?source=auronia.it&url='+share_uri);
 		$('.pinterest-share-btn').attr('href', 'http://pinterest.com/pin/create/button/?url='+ share_uri +'&media='+encodeURIComponent(img));
+		
+		if(typeof _CCTO != 'undefined' && _CCTO == 1){
+			$('.cu_pr-product_chosen').fadeOut(250);
+			$('.cu_pr-order_submitted').delay(200).fadeIn(300);
+		}else{
+			$('.cu_pr-product_chosen').delay(200).fadeIn(300);
+		}
+	});
+
+	$('.buy-cu_pr').on('click', function (e) {
+		e.preventDefault();
+
+		$('.cu_pr-order_submitted').fadeOut(250);
 		$('.cu_pr-product_chosen').delay(200).fadeIn(300);
 	});
 
@@ -110,6 +123,11 @@ jQuery(document).ready(function($) {
 
 	if(typeof _CC !== 'undefined' &&  _CC == 1){
 		$('.price, .amount').text('Gratis');
+	}
+
+	if( _CCTU == 1 ){
+		$('#order_review .product-total .amount').text('prova gratuita');
+		$('.total .amount').text('prova gratuita');
 	}
 
 });

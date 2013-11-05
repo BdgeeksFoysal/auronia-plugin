@@ -217,10 +217,10 @@ jQuery(function($){ //make sure DOM is loaded and pass $ for use
                 PostForm.showSpinner($this.parent());
                 
                 jQuery.post(ajaxurl, data, function(ret){
-                   if(ret.status == 'true'){
+                   if(ret.status == true){
                         $this.siblings('.spinner').delay(1300).remove();
 
-                        window.reload();
+                        location.reload();
                     }else{
                         $this.parent().append(ret.msg);
                     }

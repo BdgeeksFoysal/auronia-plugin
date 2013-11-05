@@ -45,7 +45,7 @@ class CFA_Downloadable_Photos{
 		die();
 	}
 
-	public static function redirect_from_secret_code($code){
+	public static function redirect_from_secret_code($code, $type){
 		$post = new WP_Query(array(
 			'post_type' => 'downloadable_photo',
 			'meta_key'	=> 'secret_code',
@@ -57,6 +57,11 @@ class CFA_Downloadable_Photos{
 				$post->the_post();
 
 				$_SESSION['cpm_secret_code_error'] = false;
+
+				if($type == 'G'){
+					$_SESSION['downloadabale_trial'] = true;
+				}
+
 				wp_redirect( get_permalink() );
 			}
 		}else{

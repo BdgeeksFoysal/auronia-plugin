@@ -191,13 +191,16 @@ class CPM_Secret_Code{
 					if( $code_type ){
 						switch ($code_type) {
 							case 'F':
-								CFA_Downloadable_Photos::redirect_from_secret_code($secret_code);
+								CFA_Downloadable_Photos::redirect_from_secret_code($secret_code, 'F');
+								break;
+							case 'G':
+								CFA_Downloadable_Photos::redirect_from_secret_code($secret_code, 'G');
 								break;
 							case 'T':
 								$applied = CPM_WC::ApplyShopCoupon($secret_code, 'T');
 								if( $applied == true){
 										$_SESSION['cpm_secret_code_error'] = false;
-										wp_redirect( get_permalink(woocommerce_get_page_id( 'shop' )) );
+										wp_redirect( get_permalink( 19766 ) );
 								}else{
 									$_SESSION['cpm_secret_code_error'] = __('Il secret code non è valido!', 'woocommerce');
 								}
@@ -227,7 +230,8 @@ class CPM_Secret_Code{
 							case 'C':
 							case 'D':
 								setcookie("trial_user", 'true', time()+3600, '/');
-								wp_redirect( get_permalink(woocommerce_get_page_id( 'shop' )) );
+								setcookie("trial_code_id", get_the_ID(), time()+3600, '/');
+								wp_redirect( get_permalink( 19759 ) );
 								break;
 							default:
 								break;
@@ -245,12 +249,11 @@ class CPM_Secret_Code{
 	public function get_code_type($code){
 		$code_initial = substr($code, 0, 1);
 
-		//if( array_key_exists($code_initial, $this->code_types) )
-			return $code_initial;
-		//else
-			//return false;
+		return $code_initial;
 	}
 
+	//this DOES NOT remove the secret code
+	//only sets the status as used
 	public function deactivate_secret_code($code_id){
 		$update = wp_update_post(array(
 			'ID'			=> $code_id,
@@ -260,6 +263,12 @@ class CPM_Secret_Code{
 		//if update was successful- returns the id of the post which will be greater than 0
 		//otherwise returns 0
 		return $update;
+	}
+
+	//this REMOVES the secret code and moves it to trash
+	public static function remove_secret_code($code_id){
+		if( $code_id && (int)$code_id > 0 )
+			wp_trash_post( $code_id );
 	}
 
 	public function admin_head_secret_code_types(){

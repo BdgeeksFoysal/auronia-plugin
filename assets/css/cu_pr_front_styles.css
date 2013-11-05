@@ -122,6 +122,14 @@ div.pp_woocommerce .pp_close {
 	line-height: 18px;
 	margin-left: 25px;
 }
+
+.privacy-terms .production {
+	background-color: inherit;
+	overflow: hidden;
+	text-align: left;
+	font-size: 16px;
+}
+
 .share-social li{
 	text-align: center;
 	margin: 15px;
@@ -201,4 +209,8 @@ div.pp_woocommerce .pp_close {
 	color: #000000;
     font-size: 18px;
     margin-top: 10px;
+}
+
+.downloadable-image-container img{
+	margin: 0 auto;
 }
