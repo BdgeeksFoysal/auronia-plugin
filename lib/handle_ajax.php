@@ -47,11 +47,23 @@ function cu_pr_add_chosen_cb() {
 			}
 
 			$customer_email_lang = get_post_meta($_POST['cu_pr_id'], 'email_tpl_customer_chosen', TRUE);
-			$customer_email = new CPM_Email('chosen', 'customer', $order->id, $_POST['cu_pr_id'], $item_uid, $customer_email_lang);
+			$customer_email = new CPM_Email('chosen', array(
+				'to' 		=> 'customer', 
+				'order_id' 	=> $order->id, 
+				'cu_pr_id' 	=> $_POST['cu_pr_id'], 
+				'item_uid' 	=> $item_uid, 
+				'lang' 		=> $customer_email_lang
+			));
 			$customer_email->use_tpl()->send_email($order->billing_email);
 
 			$admin_email_lang = get_post_meta($_POST['cu_pr_id'], 'email_tpl_admin_chosen', TRUE);
-			$admin_email = new CPM_Email('chosen', 'admin', $order->id, $_POST['cu_pr_id'], $item_uid, $admin_email_lang);
+			$admin_email = new CPM_Email('chosen', array(
+				'to'		=> 'admin', 
+				'order_id'	=> $order->id, 
+				'cu_pr_id'	=> $_POST['cu_pr_id'], 
+				'item_uid'	=> $item_uid, 
+				'lang'		=> $admin_email_lang
+			));
 			$admin_email->use_tpl()->send_email();
 
 			$ret['status'] = 'true';
@@ -161,13 +173,27 @@ function cu_pr_notify_customer_cb(){
 
 	//send email to customer and notify that the new customized product has been uploaded
 	$customer_email_lang = get_post_meta($post_id, 'email_tpl_customer_chosen', TRUE);
-	$customer_email = new CPM_Email('upload', 'customer', $order->id, $post_id, $item_uid, $customer_email_lang);
-	if($customer_email->use_tpl()->send_email($order->billing_email)) $ret['status'] = 'true';
+	$customer_email = new CPM_Email('upload', array(
+		'to'		=> 'customer', 
+		'order_id'	=> $order->id, 
+		'cu_pr_id'	=> $post_id, 
+		'item_uid'	=> $item_uid, 
+		'lang'		=> $customer_email_lang
+	));
+	if( $customer_email->use_tpl()->send_email($order->billing_email) ) 
+		$ret['status'] = 'true';
 
 	//send email to admin and notify that the new customized product has been uploaded
 	$admin_email_lang = get_post_meta($post_id, 'email_tpl_admin_chosen', TRUE);
-	$admin_email = new CPM_Email('upload', 'admin', $order->id, $post_id, $item_uid, $admin_email_lang);
-	if($admin_email->use_tpl()->send_email()) $ret['status'] = 'true';
+	$admin_email = new CPM_Email('upload', array(
+		'to'		=> 'admin', 
+		'order_id'	=> $order->id, 
+		'cu_pr_id'	=> $post_id, 
+		'item_uid'	=> $item_uid, 
+		'lang'		=> $admin_email_lang
+	));
+	if( $admin_email->use_tpl()->send_email() ) 
+		$ret['status'] = 'true';
 
 	echo json_encode($ret);
 	die();
@@ -222,7 +248,13 @@ function cu_pr_send_upload_image_email_cb(){
 		add_post_meta( $oid, $field, $val );
 	}
 
-	if( wp_mail( $order->billing_email, $sub, $cont ) ){
+	$customer_email = new CPM_Email( 'resend_image', array(
+		'tpl' 		=> $cont,
+		'sub' 		=> $sub,
+		'order_id' 	=> $order->id
+	) );
+
+	if( $customer_email->use_tpl()->send_email( $order->billing_email ) == true ){
 		update_field('field_51b5c88deafca', $sub, $oid);
 		update_field('field_51b5cd22eafcb', $cont, $oid);
 		$ret['status'] = 'true';

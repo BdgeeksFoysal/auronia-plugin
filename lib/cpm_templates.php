@@ -38,7 +38,11 @@ class CPM_Templates{
 	}
 
 	public static function create_tpl_page_tabs($cur){
-		$tabs = array('email_tpls' => 'Email Templates', 'privacy_tpls' => 'Privacy Templates');
+		$tabs = array(
+			'email_tpls' => 'Custom Product Email', 
+			'privacy_tpls' => 'Privacy Templates',
+			'downloadable_photo_email_tpls' => 'Downaloadable Photo Email',
+		);
 
 	    echo '<div id="icon-edit-pages" class="icon32 icon32-posts-page"><br></div>';
 	    echo '<h2 class="nav-tab-wrapper">';
@@ -55,6 +59,8 @@ class CPM_Templates{
 			static::html_of_email_tpl_section();
 		}elseif ($section == 'privacy_tpls') {
 			static::html_of_privacy_tpl_section();
+		}elseif ($section == 'downloadable_photo_email_tpls') {
+			static::html_of_downloadable_tpl_section();
 		}
 	}
 
@@ -331,5 +337,42 @@ class CPM_Templates{
 			$plugin_ar['cpm_email_sc'] = CPM_PLUGIN_URL.'/assets/js/cpm_mce_plugin.js';
 			return $plugin_ar;
 		}
+	}
+
+	//function that outputs the privacy template form
+	public static function html_of_downloadable_tpl_section(){
+		$downloadable_email_tpl_en = get_option('cpm_downloadable_email_tpl_en');
+		$downloadable_email_tpl_it = get_option('cpm_downloadable_email_tpl_it');
+		?>
+		<form name="privacy_tpl_form">
+			<div id="privacy_tpl_form" class="email-tpl-form">
+				<h3>Downloadable Photo Uploaded Email Text Template: </h3>
+				<table class="form-table">
+					<tbody>
+						<tr valign="top">
+							<th class="titledesc" scope="row">
+								<label for="cpm_downloadable_email_tpl_en">English Template:</label>
+							</th>
+							<td class="forminp forminp-textarea">
+								<p style="margin-top:0">Downloadable photo email Template In English. </p>
+								<?php wp_editor(stripslashes($downloadable_email_tpl_en), 'cpm_downloadable_email_tpl_en'); ?>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th class="titledesc" scope="row">
+								<label for="cpm_downloadable_email_tpl_it">Italian Template:</label>
+							</th>
+							<td class="forminp forminp-textarea">
+								<p style="margin-top:0">Downloadable photo email Template In Italian.</p>
+								<?php wp_editor(stripslashes($downloadable_email_tpl_it), 'cpm_downloadable_email_tpl_it'); ?>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			<p class="submit">
+				<input class="button-primary" type="submit" value="Save changes" name="save" id="submit_privacy_tpls">
+			</p>
+		</form>
+		<?php 
 	}
 }

@@ -128,19 +128,21 @@ jQuery(function($){ //make sure DOM is loaded and pass $ for use
 
         dl_photo_notify_button.on('click', function (e) {
             e.preventDefault();
-            var email = $(this).siblings('input[type="email"]').val();
+            var email = $(this).siblings('input[type="email"]').val(),
+                lang = $('#acf-customer_email_lang').find('input[type="radio"]:checked').val();
 
             if(email.length > 0){
                 var $this = $(this),
                     data = {
                         action : 'downloadable_photo_notify_customer',
-                        email  : email
+                        email  : email,
+                        lang   : lang
                     };
 
                 PostForm.showSpinner($this.parent());
                 
                 jQuery.post(ajaxurl, data, function(ret){
-                   if(ret.status == 'true'){
+                   if(ret.status == true){
                         $this.siblings('.spinner').delay(1300).remove();
                         $this.parent().append('<span class="msg">Email Sent!</span>');
                     }

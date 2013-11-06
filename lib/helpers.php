@@ -9,7 +9,7 @@ function print_social_btns($image = NULL){
 	$pinterest_share_uri = ($image == NULL) ? '#' : 'http://pinterest.com/pin/create/button/?url='. $share_uri .'&media='. urlencode($image['url']);
 
 	?>
-	<ul class="share-social">
+	<ul class="share-social list-unstyled">
 		<li>
 			<a class="fb-share-btn share-btn" href="<?php echo $fb_share_uri; ?>" target="_blank">
 				<img src="<?php echo CPM_PLUGIN_URL.'assets/img/facebook.png'; ?>" alt="">

@@ -27,7 +27,7 @@
 			<?php else: ?>
 				<div class="row">
 					<?php $img1 = get_field($chosen); if($img1): ?>
-					<div class="col-md-12 text-center">
+					<div class="col-lg-12 col-md-12  col-sm-12  col-xs-12 text-center">
 						<figure>
 							<a href="<?php echo $img1['sizes']['large']; ?>" rel="prettyPhoto">
 								<img src="<?php echo $img1['sizes']['large']; ?>" alt="preview image of the customized product">

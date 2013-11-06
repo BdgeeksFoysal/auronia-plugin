@@ -93,9 +93,11 @@ jQuery(function($){
     //invoice html email
     $('input#cpm_send_invoice_email').on('click', function (e) {
         e.preventDefault();
-        var data = {
+
+        var id = $(this).data('order'),
+            data = {
                 'action' : 'cpm_send_invoice_email',
-                'order_id' : $('input#post_ID').val()
+                'order_id' : id
             },
             $this = $(this);
 

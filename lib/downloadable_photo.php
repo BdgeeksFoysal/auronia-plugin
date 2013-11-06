@@ -41,7 +41,17 @@ class CFA_Downloadable_Photos{
 	}
 
 	public function downloadable_photo_notify_customer_cb(){
-		var_dump($_POST['email']);
+		extract($_POST);
+
+		$customer_email = new CPM_Email('downloadable_photo', array( 'lang' => $lang ));
+
+		if( $customer_email->use_tpl()->send_email($email) ){
+			$ret['status'] = true;
+		}else{
+			$ret['status'] = false;
+		}
+
+		wp_send_json( $ret );
 		die();
 	}
 

@@ -123,7 +123,6 @@ class CPM_WC
 
 			case 'items_details' :
 				$items = $the_order->get_items();
-				var_dump($the_order->order_custom_fields['_wc_pre_orders_when_charged']);
 				foreach ( $items as $item ) {
 					//avoiding printing any error in case the version and taglia doesnt exist
 					$versions = @$item['item_meta']['Versione'];
@@ -185,17 +184,28 @@ class CPM_WC
 		global $woocommerce;
 
 		if( strlen( $coupon_code ) > 0 ){
-			$smart_coupon = new WC_Coupon( $coupon_code );
-	        if ( $smart_coupon->is_valid() ) { // && $smart_coupon->type=='smart_coupon'
+			if( $code_type == 'T' ){
+				$smart_coupon = new WC_Coupon( $coupon_code );
+		        if ( $smart_coupon->is_valid() ) { // && $smart_coupon->type=='smart_coupon'
 
-				setcookie("coupon_activated", $code_type, time()+3600, '/');
-	        	$apply_cookie = setcookie('coupon_code', $coupon_code, time()+60*60*24, '/');
-	        	$apply_coupon = $woocommerce->cart->add_discount( sanitize_text_field( $coupon_code ));
+					setcookie("coupon_activated", $code_type, time()+3600, '/');
+		        	$apply_cookie = setcookie('coupon_code', $coupon_code, time()+60*60*24, '/');
+		        	$apply_coupon = $woocommerce->cart->add_discount( sanitize_text_field( $coupon_code ));
 
-	        	if( $apply_cookie && $apply_coupon )
-	        		return true;
+		        	if( $apply_cookie && $apply_coupon )
+		        		return true;
+				}
+			}else{
+				$smart_coupon = new WC_Coupon( $coupon_code );
+		        if ( $smart_coupon->is_valid() ) { // && $smart_coupon->type=='smart_coupon'
+
+		        	$apply_coupon = $woocommerce->cart->add_discount( sanitize_text_field( $coupon_code ));
+
+		        	if( $apply_coupon )
+		        		return true;
+				}
 			}
-		}	
+		}
 
 		return false;
 	}
@@ -411,7 +421,7 @@ class CPM_WC
 	  				<a <?php echo $button_class; ?> href="<?php echo wp_nonce_url(admin_url('?print_pip=true&post='.$post->ID.'&type=print_packing'), 'print-pip'); ?>"><?php _e('Print packing list', 'woocommerce-pip'); ?></a>
 
 					<?php if( self::OnlyProduct( 5367, 'order', $post->ID ) ): ?>
-	  					<input type="button" value="<?php echo __( 'Send Email', 'woocommerce' ); ?>" class="button button-primary" id="cpm_send_invoice_email">
+	  					<input type="button" value="<?php echo __( 'Send Email', 'woocommerce' ); ?>" data-order="<?php echo $post->ID; ?>" class="button button-primary" id="cpm_send_invoice_email">
           			<?php endif; ?>
   				</p>
   				<?php

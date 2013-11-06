@@ -1,6 +1,6 @@
 
 #content.cu_pr_preview{ 
-	width: 970px;
+	/*width: 970px;*/
 }
 #cu_pr_preview{
 	color: #000;
@@ -132,7 +132,7 @@ div.pp_woocommerce .pp_close {
 
 .share-social li{
 	text-align: center;
-	margin: 15px;
+	margin: 10px;
 	display: inline;
 	position: relative;
 }

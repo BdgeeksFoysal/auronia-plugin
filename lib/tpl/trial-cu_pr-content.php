@@ -3,7 +3,7 @@
 	<input type="hidden" value="<?php echo $order_id; ?>" name="cu_pr_order_id">
 	<input type="hidden" value="<?php echo get_the_ID(); ?>" name="cu_pr_id">
 	
-	<div class="col-md-12 text-center">
+	<div class="col-lg-12 col-md-12  col-sm-12  col-xs-12 text-center">
 		<?php cu_pr_print_fantasia_header($tpl, $wc_order); ?>
 	</div>
 
@@ -13,7 +13,7 @@
 			$i = 1;
 			while($img = get_field($img_field_name.$i)):
 		?>
-			<div class="col-md-4 ">
+			<div class="col-lg-4 col-md-4 col-sm-4  col-xs-12 ">
 				<h5 class="text-center">
 						<?php the_field($img_field_name.$i.'_title'); ?>
 					</h5>
@@ -66,7 +66,7 @@
 <div class="clearfix"></div>
 
 <div class="cu_pr-product_chosen row">	
-	<div class="col-md-12 text-center">
+	<div class="col-lg-12 col-md-12  col-sm-12  col-xs-12 text-center">
 		<h1 class="text-center">Acquista questa proposta a 90,00€</h1>
 		<figure class="text-center cu_pr-chosen-img"></figure>
 		<div class="privacy-terms">
@@ -99,7 +99,7 @@
 <div class="clearfix"></div>
 
 <div class="cu_pr-order_submitted row">
-	<div class="col-md-12 text-center">
+	<div class="col-lg-12 col-md-12  col-sm-12  col-xs-12 text-center">
 		<h1 class="submission-complete-msg">Fai vedere ai tuoi amici la tua creazione!</h1>
 		<figure class="text-center  cu_pr-chosen-img"></figure>
 		<h3 class="submission-complete-msg">Condividi la tua grafica unica con tutti</h3>
