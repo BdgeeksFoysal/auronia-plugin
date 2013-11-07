@@ -363,6 +363,3 @@ function cpm_export_secret_code_cb(){
 
 	die();
 }
-
-
-?>

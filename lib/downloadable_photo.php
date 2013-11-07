@@ -6,7 +6,7 @@
 
 class CFA_Downloadable_Photos{
 	public $post_type;
-
+	
 	public function __construct(){
 		$this->post_type = 'downloadable_photo';
 		$this->register_post_type();
@@ -55,7 +55,7 @@ class CFA_Downloadable_Photos{
 		die();
 	}
 
-	public static function redirect_from_secret_code($code, $type){
+	public static function redirect_from_secret_code($code, $type, $code_id = null){
 		$post = new WP_Query(array(
 			'post_type' => 'downloadable_photo',
 			'meta_key'	=> 'secret_code',
@@ -69,7 +69,18 @@ class CFA_Downloadable_Photos{
 				$_SESSION['cpm_secret_code_error'] = false;
 
 				if($type == 'G'){
-					$_SESSION['downloadabale_trial'] = true;
+					if( CPM_Secret_Code::is_expired( $code_id ) ){
+						$_SESSION['cpm_secret_code_error'] = __('Hai già usato questo codice, se vuoi rivedere la tua prova gratuita utilizza il link presente nell\'email che hai ricevuto.', 'woocommerce');
+						return;
+					}else{
+						setcookie('downloadabale_trial', true, time()+3600, '/');
+						setcookie('downloadabale_trial_photo', get_the_ID(), time()+3600, '/');
+						
+						setcookie("trial_user", 'true', time()+3600, '/');
+						setcookie("trial_code_id", $code_id, time()+3600, '/');
+						CPM_Secret_Code::deactivate_secret_code( get_the_ID() );
+						wp_redirect( get_permalink( get_permalink() ) );
+					}
 				}
 
 				wp_redirect( get_permalink() );

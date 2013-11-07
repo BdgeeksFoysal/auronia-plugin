@@ -16,7 +16,8 @@ class CPM_WC
 		//$this->coupon_applied = isset($woocommerce->cart->applied_coupons) && is_array($woocommerce->cart->applied_coupons) && !empty($woocommerce->cart->applied_coupons);
 		$this->coupon_applied = isset($_COOKIE['coupon_activated']) && !empty($_COOKIE['coupon_activated']);
 		$this->trial_user = isset($_COOKIE['trial_user']) && $_COOKIE['trial_user'] == 'true';
-		
+		$this->downloadable_trial_user = isset($_COOKIE['downloadabale_trial']) && $_COOKIE['downloadabale_trial'] == true;
+
 		$this->RenameDownloadImage();
 		$this->AddHoverThumb();
 
@@ -215,9 +216,12 @@ class CPM_WC
 
 		$cc = $this->coupon_applied ? 1 : 0;
 		$coupon_code_trial = $this->trial_user ? 1 : 0;
+		$coupon_code_trial_download = $this->downloadable_trial_user ? $_COOKIE['downloadabale_trial_photo'] : 0 ;
+		
 		echo '<script type="text/javascript">
 				var _CC = '. $cc .';
 				var _CCTU = '. $coupon_code_trial .';
+				var _CCTDU = '. $coupon_code_trial_download .';
 			</script>';
 	}
 
@@ -270,15 +274,23 @@ class CPM_WC
 
 	//remove all the cookies set related to secret code
 	public function RemoveSecretCodeCookie(){
-		setcookie( 'coupon_activated', false, time()+60*60*24, '/');
-		setcookie( 'trial_user', false, time()+60*60*24, '/');
-		setcookie( 'trial_code_id', false, time()+60*60*24, '/');
+		$cookies = arrray(
+			'coupon_activated',
+			'trial_user',
+			'trial_code_id',
+			'downloadabale_trial',
+			'downloadabale_trial_photo'
+		);
+
+		foreach ($cookies as $cookie) {
+			setcookie( $cookie, false, time()+60*60*24, '/' );
+		}
 	}
 
 	//remove trial code from admin panel
 	public function RemoveTrialCode($order_id){
 		if( isset($_COOKIE['trial_code_id']) && $_COOKIE['trial_code_id'] != false ){
-			CPM_Secret_Code::remove_secret_code($_COOKIE['trial_code_id']);
+			CPM_Secret_Code::expire_secret_code($_COOKIE['trial_code_id']);
 		}
 	}
 
@@ -328,7 +340,13 @@ class CPM_WC
 
 	//remove product added to cart message if user is a trial user
 	public function RemoveAddToCartMessage($message){
-		return false;
+		global $woocommerce;
+
+		if( count($woocommerce->messages) > 0 ){
+			return false;
+		}else{
+			return 'dont_show';
+		}
 	}
 
 	/*

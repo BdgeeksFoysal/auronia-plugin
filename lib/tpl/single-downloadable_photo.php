@@ -13,7 +13,7 @@
 				</div>
 				<div class="clearfix"></div>
 				<div class="col-md-12 col-sm-12 col-xs-12 text-center">
-				<a href="<?php echo $img['sizes']['large']; ?>" class="btn btn-default" download><?php _e( 'Download:', woocommerce ); ?></a>
+				<a href="<?php echo $img['sizes']['large']; ?>" class="btn btn-default" download><?php _e( 'Download:', 'woocommerce' ); ?></a>
 				</div>
 			<?php endif; ?>
 			</div>

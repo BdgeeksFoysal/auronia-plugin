@@ -12,11 +12,13 @@ class CPM_Secret_Code{
 			'A' => 'Try And Buy',
 			'F' => 'Photo Download',
 			'T' => 'Regala Auronia',
+			'G' => 'Try From Photo',
 		);
 		$this->code_post_type = 'cpm_secret_code';
 		$this->code_post_statuses = array(
 			//status => text description of the status
 			'active_secret_code'	=> 'Active', 
+			'expired_secret_code'	=> 'Expired', 
 			'used_secret_code'		=> 'Used'
 		);
 		
@@ -176,25 +178,23 @@ class CPM_Secret_Code{
 			$code = new WP_Query(array(
 				'post_type' => array( $this->code_post_type, 'shop_coupon' ),
 				'cpm_secret_code' => esc_attr( $secret_code ),
-				'posts_per_page' => 1
+				'posts_per_page' => 1,
 			));
 
 			if($code->have_posts()){
 				while($code->have_posts()){
 					$code->the_post();
 
-					if( get_post_type( get_the_ID() ) != 'shop_coupon' )
-						$this->deactivate_secret_code( get_the_ID() );
-
 					$code_type = $this->get_code_type( get_the_title() );
 
 					if( $code_type ){
 						switch ($code_type) {
 							case 'F':
+								self::deactivate_secret_code( get_the_ID() );
 								CFA_Downloadable_Photos::redirect_from_secret_code($secret_code, 'F');
 								break;
 							case 'G':
-								CFA_Downloadable_Photos::redirect_from_secret_code($secret_code, 'G');
+								CFA_Downloadable_Photos::redirect_from_secret_code($secret_code, 'G', get_the_ID());
 								break;
 							case 'T':
 								$applied = CPM_WC::ApplyShopCoupon($secret_code, 'T');
@@ -229,9 +229,14 @@ class CPM_Secret_Code{
 							case 'A':
 							case 'C':
 							case 'D':
-								setcookie("trial_user", 'true', time()+3600, '/');
-								setcookie("trial_code_id", get_the_ID(), time()+3600, '/');
-								wp_redirect( get_permalink( 19759 ) );
+								if( self::is_expired( get_the_ID() ) ){
+									$_SESSION['cpm_secret_code_error'] = __('Hai già usato questo codice, se vuoi rivedere la tua prova gratuita utilizza il link presente nell\'email che hai ricevuto.', 'woocommerce');
+								}else{
+									self::deactivate_secret_code( get_the_ID() );
+									setcookie("trial_user", 'true', time()+3600, '/');
+									setcookie("trial_code_id", get_the_ID(), time()+3600, '/');
+									wp_redirect( get_permalink( 19759 ) );
+								}
 								break;
 							default:
 								break;
@@ -252,9 +257,27 @@ class CPM_Secret_Code{
 		return $code_initial;
 	}
 
+	//checks if secret code is expired
+	public static function is_expired($param){
+		if( is_int($param) ){
+			return get_post_status( $param ) == 'expired_secret_code';
+		}else{
+			return $param == 'expired_secret_code';
+		}
+	}
+
+	//checks if secret code is used
+	public function is_used($param){
+		if( is_int($param) ){
+			return get_post_status( $param ) == 'used_secret_code';
+		}else{
+			return $param == 'used_secret_code';
+		}
+	}
+
 	//this DOES NOT remove the secret code
 	//only sets the status as used
-	public function deactivate_secret_code($code_id){
+	public static function deactivate_secret_code($code_id){
 		$update = wp_update_post(array(
 			'ID'			=> $code_id,
 			'post_status'	=> 'used_secret_code'
@@ -269,6 +292,14 @@ class CPM_Secret_Code{
 	public static function remove_secret_code($code_id){
 		if( $code_id && (int)$code_id > 0 )
 			wp_trash_post( $code_id );
+	}
+
+	//this EXPIRES the secret code and moves it to trash
+	public static function expire_secret_code($code_id){
+		wp_update_post(array(
+			'ID'			=> $code_id,
+			'post_status'	=> 'expired_secret_code'
+		));
 	}
 
 	public function admin_head_secret_code_types(){
@@ -289,7 +320,8 @@ class CPM_Secret_Code{
 			'post_type' => array( $this->code_post_type ),
 			'meta_key' 	=> 'code_type',
 			'meta_value'=> $for,
-			'cpm_secret_code_date_after' => $after
+			'cpm_secret_code_date_after' => $after,
+			'posts_per_page' => 100000
 		));
 
 		if( $codes->have_posts() ){

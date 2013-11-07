@@ -23,7 +23,7 @@ function cu_pr_popup_text_sc_cb($atts, $cont){
 add_shortcode('cu_pr_download_photo_button_sc', 'cu_pr_download_photo_button_sc_cb');
 
 function cu_pr_download_photo_button_sc_cb($atts, $cont){
-	if( isset($_SESSION['downloadabale_trial']) && $_SESSION['downloadabale_trial'] == true ){
+	if( isset($_COOKIE['downloadabale_trial']) && $_COOKIE['downloadabale_trial'] == true ){
 		$url = 'shop/capricci';
 		$title = 'Crea';
 	}else{
@@ -39,7 +39,7 @@ function cu_pr_download_photo_button_sc_cb($atts, $cont){
 add_shortcode('cu_pr_download_photo_content_sc', 'cu_pr_download_photo_content_sc_cb');
 
 function cu_pr_download_photo_content_sc_cb($atts, $cont){
-	if( isset($_SESSION['downloadabale_trial']) && $_SESSION['downloadabale_trial'] == true ){
+	if( isset($_COOKIE['downloadabale_trial']) && $_COOKIE['downloadabale_trial'] == true ){
 		$content = '<h3>Una tua fotografia è molto più di qualcosa che ti ritrae.</h3>
 					<h3>Conserva magicamente le emozioni di quel momento.</h3>
 					<h3>Trasformala in un momento glamour: metti al lavoro il nostro team creativo e lasciati sorprendere dalla magia di AURONIA.</h3>
